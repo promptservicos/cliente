@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal - Parceiros Prompt</title>
+    <!-- Ícones Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-right: 1px solid #ffe6e6;
+            padding: 30px 0;
+            box-shadow: 2px 0 10px rgba(220, 53, 69, 0.05);
+        }
+
+        .logo {
+            padding: 0 30px 30px 30px;
+            border-bottom: 1px solid #f8f9fa;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .logo-img {
+            max-width: 180px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .logo-fallback {
+            color: #dc3545;
+            font-size: 24px;
+            font-weight: 600;
+            display: none; /* Só aparece se a imagem não carregar */
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0 20px;
+        }
+
+        .nav-item {
+            margin-bottom: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: #495057;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background: #fff5f5;
+            color: #dc3545;
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            background: #dc3545;
+            color: white;
+        }
+
+        .nav-icon {
+            margin-right: 12px;
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 25px 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(220, 53, 69, 0.08);
+            border: 1px solid #ffe6e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-center {
+            text-align: center;
+            flex: 1;
+        }
+
+        .header-center h1 {
+            color: #dc3545;
+            font-size: 28px;
+            font-weight: 300;
+            margin-bottom: 5px;
+        }
+
+        .header-center p {
+            color: #6c757d;
+            font-size: 16px;
+        }
+
+        .user-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            border-left: 4px solid #dc3545;
+            min-width: 280px;
+        }
+
+        .user-info {
+            margin-bottom: 15px;
+        }
+
+        .user-name {
+            color: #212529;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .user-role {
+            color: #6c757d;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .user-company {
+            color: #dc3545;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            width: 100%;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+        }
+
+        /* Welcome Section */
+        .welcome-section {
+            background: white;
+            border-radius: 20px;
+            padding: 50px;
+            box-shadow: 0 5px 20px rgba(220, 53, 69, 0.08);
+            border: 1px solid #ffe6e6;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .welcome-icon {
+            font-size: 48px;
+            color: #dc3545;
+            margin-bottom: 20px;
+        }
+
+        .welcome-section h2 {
+            color: #dc3545;
+            font-size: 32px;
+            font-weight: 300;
+            margin-bottom: 15px;
+        }
+
+        .welcome-section .user-welcome {
+            color: #dc3545;
+            font-weight: 600;
+        }
+
+        .welcome-section p {
+            color: #6c757d;
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #ffe6e6;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            .user-card {
+                min-width: auto;
+                width: 100%;
+            }
+
+            .logo-img {
+                max-width: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+        <div class="logo">
+            <img src="/img/prompt.png" alt="Prompt Serviços" class="logo-img" onerror="this.style.display='none'; document.querySelector('.logo-fallback').style.display='block';">
+            <div class="logo-fallback">Portal Parceiros</div>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="#" class="nav-link active">
+                    <i class="nav-icon fas fa-home"></i>
+                    Início
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="funcionarios.html" class="nav-link">
+                    <i class="nav-icon fas fa-users"></i>
+                    Funcionários
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="processos.html" class="nav-link">
+                    <i class="nav-icon fas fa-chart-line"></i>
+                    Processos
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="documentos.html" class="nav-link">
+                    <i class="nav-icon fas fa-folder"></i>
+                    Documentos
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="chamados.html" class="nav-link">
+                    <i class="nav-icon fas fa-ticket-alt"></i>
+                    Chamados
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-center">
+                <h1>Portal - Parceiros Prompt</h1>
+                <p>Acesso exclusivo para clientes</p>
+            </div>
+            <div class="user-card">
+                <div class="user-info">
+                    <div class="user-name" id="headerUserName">Carregando...</div>
+                    <div class="user-role" id="headerUserRole">Carregando...</div>
+                    <div class="user-company" id="headerUserCompany">Carregando...</div>
+                </div>
+                <button class="logout-btn" onclick="sair()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Sair do Portal
+                </button>
+            </div>
+        </header>
+
+        <!-- Welcome Section -->
+        <section class="welcome-section">
+            <div class="welcome-icon">
+                <i class="fas fa-rocket"></i>
+            </div>
+            <h2>Bem-vindo ao seu portal, <span class="user-welcome" id="welcomeUserName">Carregando...</span></h2>
+            <p>Aqui você encontra todas as informações importantes da nossa parceria</p>
+        </section>
+    </main>
+
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDWyX6DXg5APApHznIwe_4l6W_D9HA7_JI",
+            authDomain: "clientes-prompt-e83cb.firebaseapp.com",
+            projectId: "clientes-prompt-e83cb",
+            storageBucket: "clientes-prompt-e83cb.firebasestorage.app",
+            messagingSenderId: "36358707713",
+            appId: "1:36358707713:web:a3d97276a327123233fe00"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        let alreadyLoaded = false;
+
+        // ÚNICO onAuthStateChanged - SEM DUPLICAÇÃO
+        onAuthStateChanged(auth, (user) => {
+            console.log('🔐 Status autenticação:', user ? 'Logado' : 'Não logado');
+            
+            if (!user) {
+                window.location.href = "index.html";
+            } else {
+                currentUser = user;
+                console.log('✅ Usuário logado:', user.email);
+                
+                if (!alreadyLoaded) {
+                    carregarDadosUsuario(user);
+                    alreadyLoaded = true;
+                }
+            }
+        });
+
+        // Carregar dados do usuário
+        async function carregarDadosUsuario(user) {
+            try {
+                console.log('🔍 Buscando dados do usuário:', user.uid);
+                
+                const userDoc = await getDoc(doc(db, 'usuarios', user.uid));
+                
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    console.log('✅ Dados encontrados:', userData);
+                    
+                    // Preenche os dados
+                    document.getElementById('headerUserName').textContent = userData.nome;
+                    document.getElementById('headerUserRole').textContent = userData.cargo;
+                    document.getElementById('headerUserCompany').textContent = userData.empresa;
+                    document.getElementById('welcomeUserName').textContent = userData.nome;
+                    
+                    console.log('🎯 Dados preenchidos com sucesso!');
+                    
+                } else {
+                    console.log('❌ Usuário não encontrado na base');
+                    document.getElementById('headerUserName').textContent = 'Usuário não cadastrado';
+                    document.getElementById('headerUserRole').textContent = 'Contate o administrador';
+                    document.getElementById('headerUserCompany').textContent = 'Prompt Serviços';
+                    document.getElementById('welcomeUserName').textContent = 'Visitante';
+                }
+            } catch (error) {
+                console.error('💥 Erro ao carregar dados:', error);
+                document.getElementById('headerUserName').textContent = 'Erro ao carregar';
+                document.getElementById('headerUserRole').textContent = 'Tente novamente';
+                document.getElementById('headerUserCompany').textContent = 'Prompt Serviços';
+                document.getElementById('welcomeUserName').textContent = 'Visitante';
+            }
+        }
+
+        // Sair
+        window.sair = function() {
+            console.log('🚪 Saindo do sistema...');
+            signOut(auth).then(() => {
+                window.location.href = "index.html";
+            });
+        }
+
+        // Navegação da sidebar
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                if (this.getAttribute('href') === '#') {
+                    e.preventDefault();
+                }
+                
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
