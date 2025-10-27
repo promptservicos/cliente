@@ -312,6 +312,12 @@
             font-size: 14px;
         }
 
+        .empresa {
+            color: #6c757d;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
         .loading {
             text-align: center;
             padding: 40px;
@@ -358,6 +364,13 @@
         .employee-role {
             color: #6c757d;
             font-size: 14px;
+        }
+
+        .employee-company {
+            color: #dc3545;
+            font-size: 12px;
+            font-weight: 500;
+            margin-top: 3px;
         }
 
         .employee-details {
@@ -584,7 +597,7 @@
         <!-- Employees Section -->
         <section class="employees-section">
             <div class="section-header">
-                <h2>Lista de Funcionários - <span id="empresaNome">AEROVIP</span></h2>
+                <h2 id="sectionTitle">Lista de Funcionários - <span id="empresaNome">AEROVIP</span></h2>
                 <div class="search-box">
                     <input type="text" class="search-input" id="searchInput" placeholder="Buscar funcionário...">
                 </div>
@@ -616,6 +629,9 @@
                         </th>
                         <th onclick="sortTable(5)">
                             Vínculo <i class="fas fa-sort"></i>
+                        </th>
+                        <th onclick="sortTable(6)">
+                            Empresa <i class="fas fa-sort"></i>
                         </th>
                     </tr>
                 </thead>
@@ -661,6 +677,7 @@
         let employees = [];
         let sortDirection = {};
         let userEmpresa = '';
+        let isPromptServicos = false;
 
         // Função para converter salário do formato BR para número
         function converterSalarioBR(salarioTexto) {
@@ -708,7 +725,17 @@
                     
                     // Define a empresa para filtrar no Google Sheets
                     userEmpresa = userData.empresa;
-                    document.getElementById('empresaNome').textContent = userEmpresa;
+                    
+                    // Verifica se é PROMPT SERVIÇOS para acesso completo
+                    isPromptServicos = userEmpresa.toUpperCase().includes('PROMPT SERVIÇOS') || 
+                                      userEmpresa.toUpperCase().includes('PROMPT SERVICOS');
+                    
+                    // Atualiza o título da seção
+                    if (isPromptServicos) {
+                        document.getElementById('sectionTitle').innerHTML = 'Lista de Funcionários - <span id="empresaNome">TODAS AS EMPRESAS</span>';
+                    } else {
+                        document.getElementById('empresaNome').textContent = userEmpresa;
+                    }
                     
                     // Carrega dados do Google Sheets (funcionários E vagas)
                     await carregarDadosSheets();
@@ -778,7 +805,7 @@
                 if (data.values && data.values.length > 0) {
                     const vagasCount = contarVagasAbertas(data.values);
                     document.getElementById('vagasAbertas').textContent = vagasCount;
-                    console.log(`🎯 ${vagasCount} vagas abertas encontradas para ${userEmpresa}`);
+                    console.log(`🎯 ${vagasCount} vagas abertas encontradas`);
                 }
                 
             } catch (error) {
@@ -812,9 +839,12 @@
                     const empresaE = row[empresaEIndex];
                     const empresaF = row[empresaFIndex];
                     
-                    // Verifica se a vaga está aberta (FALSE) e pertence à empresa
+                    // Verifica se a vaga está aberta (FALSE)
                     const vagaAberta = fechada === 'FALSE' || fechada === 'false' || fechada === false;
-                    const pertenceEmpresa = empresaE === userEmpresa || empresaF === userEmpresa;
+                    
+                    // Se for PROMPT SERVIÇOS, conta todas as vagas abertas
+                    // Se não for, conta apenas as vagas da empresa do usuário
+                    const pertenceEmpresa = isPromptServicos || empresaE === userEmpresa || empresaF === userEmpresa;
                     
                     if (vagaAberta && pertenceEmpresa) {
                         vagasCount++;
@@ -830,7 +860,7 @@
             }
         }
 
-        // Processar dados do Sheets - VERSÃO CORRIGIDA (COLUNA E)
+        // Processar dados do Sheets - VERSÃO MODIFICADA PARA PROMPT SERVIÇOS
         function processarDadosSheets(sheetData) {
             try {
                 // A primeira linha são os cabeçalhos
@@ -856,9 +886,10 @@
                     vinculo: vinculoIndex
                 });
                 
-                console.log(`🔍 Buscando empresa: "${userEmpresa}" na coluna "Nome Cliente"`);
+                console.log(`🔍 Buscando funcionários para: "${userEmpresa}"`);
+                console.log(`🔑 Acesso completo: ${isPromptServicos}`);
                 
-                // Filtra apenas as linhas da empresa do usuário
+                // Filtra as linhas conforme o tipo de usuário
                 employees = [];
                 let empresasEncontradas = new Set();
                 
@@ -874,22 +905,26 @@
                             console.log(`Linha ${i}: Nome Cliente = "${empresaNaLinha}"`);
                         }
                         
-                        // Verifica se a linha é da empresa correta (busca exata)
-                        if (empresaNaLinha.trim() === userEmpresa.trim() && row[nomeIndex] && row[nomeIndex].trim() !== '') {
+                        // Verifica se deve incluir o funcionário
+                        const deveIncluir = isPromptServicos || 
+                                          (empresaNaLinha.trim() === userEmpresa.trim() && row[nomeIndex] && row[nomeIndex].trim() !== '');
+                        
+                        if (deveIncluir) {
                             employees.push({
                                 nome: row[nomeIndex] || '',
                                 funcao: row[funcaoIndex] || '',
-                                salario: converterSalarioBR(row[salarioIndex]), // CORREÇÃO DO SALÁRIO
+                                salario: converterSalarioBR(row[salarioIndex]),
                                 cpf: row[cpfIndex] || '',
                                 admissao: row[admissaoIndex] || '',
-                                vinculo: row[vinculoIndex] || ''
+                                vinculo: row[vinculoIndex] || '',
+                                empresa: empresaNaLinha || ''
                             });
                         }
                     }
                 }
                 
                 console.log('🏢 Todas as empresas encontradas na coluna "Nome Cliente":', Array.from(empresasEncontradas));
-                console.log(`✅ ${employees.length} funcionários encontrados para ${userEmpresa}`);
+                console.log(`✅ ${employees.length} funcionários encontrados`);
                 
                 // Atualiza a interface
                 atualizarEstatisticas();
@@ -937,9 +972,9 @@
             if (employees.length === 0) {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td colspan="6" style="text-align: center; padding: 40px; color: #6c757d;">
+                    <td colspan="7" style="text-align: center; padding: 40px; color: #6c757d;">
                         <i class="fas fa-users" style="font-size: 32px; margin-bottom: 10px; display: block; color: #dc3545;"></i>
-                        Nenhum funcionário encontrado para ${userEmpresa}
+                        ${isPromptServicos ? 'Nenhum funcionário encontrado' : `Nenhum funcionário encontrado para ${userEmpresa}`}
                     </td>
                 `;
                 tbody.appendChild(row);
@@ -955,6 +990,7 @@
                     <td class="cpf">${funcionario.cpf}</td>
                     <td class="admission">${funcionario.admissao}</td>
                     <td>${funcionario.vinculo}</td>
+                    <td class="empresa">${isPromptServicos ? funcionario.empresa : ''}</td>
                 `;
                 tbody.appendChild(row);
             });
@@ -969,7 +1005,7 @@
                 cardsContainer.innerHTML = `
                     <div style="text-align: center; padding: 40px; color: #6c757d;">
                         <i class="fas fa-users" style="font-size: 32px; margin-bottom: 10px; display: block; color: #dc3545;"></i>
-                        Nenhum funcionário encontrado para ${userEmpresa}
+                        ${isPromptServicos ? 'Nenhum funcionário encontrado' : `Nenhum funcionário encontrado para ${userEmpresa}`}
                     </div>
                 `;
                 return;
@@ -983,6 +1019,7 @@
                         <div>
                             <div class="employee-name">${funcionario.nome}</div>
                             <div class="employee-role">${funcionario.funcao}</div>
+                            ${isPromptServicos ? `<div class="employee-company">${funcionario.empresa}</div>` : ''}
                         </div>
                     </div>
                     <div class="employee-details">
@@ -1061,6 +1098,10 @@
                         valueA = a.vinculo.toLowerCase();
                         valueB = b.vinculo.toLowerCase();
                         break;
+                    case 6: // Empresa
+                        valueA = a.empresa.toLowerCase();
+                        valueB = b.empresa.toLowerCase();
+                        break;
                 }
 
                 if (valueA < valueB) return sortDirection[columnIndex] === 'asc' ? -1 : 1;
@@ -1083,7 +1124,8 @@
                     funcionario.nome.toLowerCase().includes(searchTerm) ||
                     funcionario.funcao.toLowerCase().includes(searchTerm) ||
                     funcionario.cpf.includes(searchTerm) ||
-                    funcionario.vinculo.toLowerCase().includes(searchTerm)
+                    funcionario.vinculo.toLowerCase().includes(searchTerm) ||
+                    (isPromptServicos && funcionario.empresa.toLowerCase().includes(searchTerm))
                 );
                 
                 // Atualiza a tabela com os resultados filtrados
