@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Funcionários - Portal Parceiros Prompt</title>
+    <title>Vagas Abertas - Portal Parceiros Prompt</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -175,7 +175,7 @@
             background: #c82333;
         }
 
-        /* Stats Cards - COM EFEITO HOVER */
+        /* Stats Cards */
         .stats-cards {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -218,8 +218,8 @@
             font-weight: 500;
         }
 
-        /* Employees Table */
-        .employees-section {
+        /* Vagas Table */
+        .vagas-section {
             background: white;
             border-radius: 20px;
             padding: 30px;
@@ -258,12 +258,12 @@
             border-color: #dc3545;
         }
 
-        .employees-table {
+        .vagas-table {
             width: 100%;
             border-collapse: collapse;
         }
 
-        .employees-table th {
+        .vagas-table th {
             background: #f8f9fa;
             padding: 15px;
             text-align: left;
@@ -275,40 +275,35 @@
             user-select: none;
         }
 
-        .employees-table th:hover {
+        .vagas-table th:hover {
             background: #fff5f5;
             color: #dc3545;
         }
 
-        .employees-table th i {
+        .vagas-table th i {
             margin-left: 5px;
             font-size: 12px;
             opacity: 0.6;
         }
 
-        .employees-table td {
+        .vagas-table td {
             padding: 15px;
             border-bottom: 1px solid #e9ecef;
             color: #495057;
         }
 
-        .employees-table tr:hover {
+        .vagas-table tr:hover {
             background: #f8f9fa;
         }
 
-        .salary {
+        .vaga-aberta {
             color: #28a745;
             font-weight: 600;
         }
 
-        .cpf {
-            font-family: monospace;
-            letter-spacing: 1px;
-        }
-
-        .admission {
-            color: #6c757d;
-            font-size: 14px;
+        .vaga-fechada {
+            color: #dc3545;
+            font-weight: 600;
         }
 
         .loading {
@@ -362,12 +357,12 @@
                 width: 100%;
             }
 
-            .employees-table {
+            .vagas-table {
                 font-size: 14px;
             }
 
-            .employees-table th,
-            .employees-table td {
+            .vagas-table th,
+            .vagas-table td {
                 padding: 10px 8px;
             }
         }
@@ -388,13 +383,13 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="funcionarios.html" class="nav-link active">
+                <a href="funcionarios.html" class="nav-link">
                     <i class="nav-icon fas fa-users"></i>
                     Funcionários
                 </a>
             </li>
             <li class="nav-item">
-                <a href="vagas.html" class="nav-link">
+                <a href="vagas.html" class="nav-link active">
                     <i class="nav-icon fas fa-briefcase"></i>
                     Vagas Abertas
                 </a>
@@ -413,8 +408,8 @@
         <!-- Header -->
         <header class="header">
             <div class="header-center">
-                <h1>Funcionários - Portal Parceiros Prompt</h1>
-                <p>Gestão de equipe e colaboradores</p>
+                <h1>Vagas Abertas - Portal Parceiros Prompt</h1>
+                <p>Gestão de oportunidades e recrutamento</p>
             </div>
             <div class="user-card">
                 <div class="user-info">
@@ -442,17 +437,17 @@
                 <div class="stat-icon">
                     <i class="fas fa-briefcase"></i>
                 </div>
-                <div class="stat-number" id="vagasAbertas">0</div>
+                <div class="stat-number" id="totalVagas">0</div>
                 <div class="stat-label">Vagas Abertas</div>
             </div>
         </div>
 
-        <!-- Employees Table -->
-        <section class="employees-section">
+        <!-- Vagas Table -->
+        <section class="vagas-section">
             <div class="section-header">
-                <h2>Lista de Funcionários - <span id="empresaNome">AEROVIP</span></h2>
+                <h2>Lista de Vagas - <span id="empresaNome">AEROVIP</span></h2>
                 <div class="search-box">
-                    <input type="text" class="search-input" id="searchInput" placeholder="Buscar funcionário...">
+                    <input type="text" class="search-input" id="searchInput" placeholder="Buscar por cargo...">
                 </div>
             </div>
 
@@ -461,30 +456,24 @@
                 <p>Carregando dados do Google Sheets...</p>
             </div>
 
-            <table class="employees-table" id="employeesTable" style="display: none;">
+            <table class="vagas-table" id="vagasTable" style="display: none;">
                 <thead>
                     <tr>
                         <th onclick="sortTable(0)">
-                            Nome <i class="fas fa-sort"></i>
+                            Abertura <i class="fas fa-sort"></i>
                         </th>
                         <th onclick="sortTable(1)">
-                            Função <i class="fas fa-sort"></i>
+                            Cargo <i class="fas fa-sort"></i>
                         </th>
                         <th onclick="sortTable(2)">
-                            Salário <i class="fas fa-sort"></i>
+                            Modalidade <i class="fas fa-sort"></i>
                         </th>
                         <th onclick="sortTable(3)">
-                            CPF <i class="fas fa-sort"></i>
-                        </th>
-                        <th onclick="sortTable(4)">
-                            Admissão <i class="fas fa-sort"></i>
-                        </th>
-                        <th onclick="sortTable(5)">
-                            Vínculo <i class="fas fa-sort"></i>
+                            Status <i class="fas fa-sort"></i>
                         </th>
                     </tr>
                 </thead>
-                <tbody id="employeesTableBody">
+                <tbody id="vagasTableBody">
                     <!-- Dados serão preenchidos via JavaScript -->
                 </tbody>
             </table>
@@ -511,38 +500,16 @@
         const db = getFirestore(app);
 
         // CONFIGURAÇÃO GOOGLE SHEETS
-        const SHEET_ID = '1pWubFAN2r6V8XwOT_QAN1MWsYAPq2K0Ar2Sq412cTjc';
         const SHEET_ID_VAGAS = '1bR9lW1oy6XH1Lg7cTVUtupXQBEsLKta1hfDAhyVkMQ0';
+        const SHEET_ID_FUNCIONARIOS = '1pWubFAN2r6V8XwOT_QAN1MWsYAPq2K0Ar2Sq412cTjc';
         const API_KEY = 'AIzaSyCNjAwMWIYyBrBLm0P8DG2Lbre7HypmGdw';
-        const RANGE = 'A:L'; // Colunas de A até L
-        const RANGE_VAGAS = 'Interno!A:F'; // Colunas A até F da aba "Interno"
+        const RANGE_VAGAS = 'Interno!A:S'; // Colunas A até S da aba "Interno"
+        const RANGE_FUNCIONARIOS = 'A:L'; // Colunas A até L
 
         let currentUser = null;
-        let employees = [];
+        let vagas = [];
         let sortDirection = {};
         let userEmpresa = '';
-
-        // Função para converter salário do formato BR para número
-        function converterSalarioBR(salarioTexto) {
-            if (!salarioTexto) return 0;
-            
-            // Remove "R$", espaços e pontos (separadores de milhar)
-            let limpo = salarioTexto.toString()
-                .replace('R$', '')
-                .replace(/\./g, '')  // Remove pontos
-                .replace(/\s/g, '')  // Remove espaços
-                .trim();
-            
-            // Substitui vírgula por ponto (para decimal)
-            limpo = limpo.replace(',', '.');
-            
-            // Converte para número
-            const numero = parseFloat(limpo);
-            
-            console.log(`💰 Conversão: "${salarioTexto}" → "${limpo}" → ${numero}`);
-            
-            return isNaN(numero) ? 0 : numero;
-        }
 
         // Verificar autenticação
         onAuthStateChanged(auth, (user) => {
@@ -570,9 +537,9 @@
                     userEmpresa = userData.empresa;
                     document.getElementById('empresaNome').textContent = userEmpresa;
                     
-                    // Carrega dados do Google Sheets (funcionários E vagas)
-                    await carregarDadosSheets();
-                    await carregarVagasAbertas();
+                    // Carrega dados do Google Sheets (vagas E funcionários)
+                    await carregarVagasDetalhadas();
+                    await carregarTotalFuncionarios();
                     
                 } else {
                     document.getElementById('headerUserName').textContent = 'Usuário não cadastrado';
@@ -587,43 +554,65 @@
             }
         }
 
-        // Carregar dados do Google Sheets (Funcionários)
-        async function carregarDadosSheets() {
+        // Carregar total de funcionários
+        async function carregarTotalFuncionarios() {
             try {
-                console.log('📊 Carregando dados do Google Sheets...');
+                console.log('👥 Carregando total de funcionários...');
                 
-                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?key=${API_KEY}`;
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID_FUNCIONARIOS}/values/${RANGE_FUNCIONARIOS}?key=${API_KEY}`;
                 const response = await fetch(url);
                 
                 if (!response.ok) {
-                    throw new Error(`Erro na API: ${response.status}`);
+                    throw new Error(`Erro na API de funcionários: ${response.status}`);
                 }
                 
                 const data = await response.json();
-                console.log('✅ Dados recebidos do Sheets:', data);
                 
                 if (data.values && data.values.length > 0) {
-                    processarDadosSheets(data.values);
-                } else {
-                    throw new Error('Planilha vazia ou sem dados');
+                    const totalFuncionarios = contarFuncionariosAtivos(data.values);
+                    document.getElementById('totalFuncionarios').textContent = totalFuncionarios;
+                    console.log(`✅ ${totalFuncionarios} funcionários ativos encontrados para ${userEmpresa}`);
                 }
                 
             } catch (error) {
-                console.error('❌ Erro ao carregar do Sheets:', error);
-                document.getElementById('loadingMessage').innerHTML = `
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <p>Erro ao carregar dados: ${error.message}</p>
-                    <button onclick="carregarDadosSheets()" style="margin-top: 10px; padding: 8px 16px; background: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                        Tentar Novamente
-                    </button>
-                `;
+                console.error('❌ Erro ao carregar funcionários:', error);
+                document.getElementById('totalFuncionarios').textContent = '0';
             }
         }
 
-        // Carregar vagas abertas
-        async function carregarVagasAbertas() {
+        // Contar funcionários ativos
+        function contarFuncionariosAtivos(funcionariosData) {
             try {
-                console.log('📋 Carregando vagas abertas...');
+                const headers = funcionariosData[0];
+                const empresaIndex = headers.indexOf('Nome Cliente');
+                const nomeIndex = headers.indexOf('Nome');
+                
+                let totalFuncionarios = 0;
+                
+                for (let i = 1; i < funcionariosData.length; i++) {
+                    const row = funcionariosData[i];
+                    const empresaNaLinha = row[empresaIndex];
+                    const nomeFuncionario = row[nomeIndex];
+                    
+                    if (empresaNaLinha && nomeFuncionario && 
+                        empresaNaLinha.trim() === userEmpresa.trim() && 
+                        nomeFuncionario.trim() !== '') {
+                        totalFuncionarios++;
+                    }
+                }
+                
+                return totalFuncionarios;
+                
+            } catch (error) {
+                console.error('❌ Erro ao contar funcionários:', error);
+                return 0;
+            }
+        }
+
+        // Carregar vagas detalhadas
+        async function carregarVagasDetalhadas() {
+            try {
+                console.log('📋 Carregando vagas detalhadas...');
                 
                 const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID_VAGAS}/values/${RANGE_VAGAS}?key=${API_KEY}`;
                 const response = await fetch(url);
@@ -636,179 +625,162 @@
                 console.log('✅ Dados de vagas recebidos:', data);
                 
                 if (data.values && data.values.length > 0) {
-                    const vagasCount = contarVagasAbertas(data.values);
-                    document.getElementById('vagasAbertas').textContent = vagasCount;
-                    console.log(`🎯 ${vagasCount} vagas abertas encontradas para ${userEmpresa}`);
+                    processarVagasDetalhadas(data.values);
+                } else {
+                    throw new Error('Planilha de vagas vazia ou sem dados');
                 }
                 
             } catch (error) {
                 console.error('❌ Erro ao carregar vagas:', error);
-                document.getElementById('vagasAbertas').textContent = '0';
+                document.getElementById('loadingMessage').innerHTML = `
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>Erro ao carregar vagas: ${error.message}</p>
+                    <button onclick="carregarVagasDetalhadas()" style="margin-top: 10px; padding: 8px 16px; background: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        Tentar Novamente
+                    </button>
+                `;
             }
         }
 
-        // Contar vagas abertas
-        function contarVagasAbertas(vagasData) {
+        // Processar vagas detalhadas
+        function processarVagasDetalhadas(vagasData) {
             try {
                 const headers = vagasData[0];
                 console.log('📋 Cabeçalhos da planilha de vagas:', headers);
                 
-                // Encontra os índices das colunas
+                // Encontra os índices das colunas conforme solicitado
+                const aberturaIndex = headers.indexOf('Carimbo de data/hora'); // Coluna A
+                const cargoIndex = headers.indexOf('CARGOS'); // Coluna O
+                const modalidadeIndex = headers.indexOf('TIPO DE CONTRATO'); // Coluna S
                 const fechadaIndex = headers.indexOf('VAGA FECHADA'); // Coluna C
-                const empresaEIndex = 4; // Coluna E (índice 4)
-                const empresaFIndex = 5; // Coluna F (índice 5)
+                const empresaEIndex = 4; // Coluna E
+                const empresaFIndex = 5; // Coluna F
                 
                 console.log('🎯 Índices das colunas de vagas:', {
+                    abertura: aberturaIndex,
+                    cargo: cargoIndex,
+                    modalidade: modalidadeIndex,
                     fechada: fechadaIndex,
                     empresaE: empresaEIndex,
                     empresaF: empresaFIndex
                 });
                 
-                let vagasCount = 0;
+                vagas = [];
+                let totalVagasAbertas = 0;
                 
                 for (let i = 1; i < vagasData.length; i++) {
                     const row = vagasData[i];
                     const fechada = row[fechadaIndex];
                     const empresaE = row[empresaEIndex];
                     const empresaF = row[empresaFIndex];
+                    const cargo = row[cargoIndex];
+                    const abertura = row[aberturaIndex];
+                    const modalidade = row[modalidadeIndex];
                     
-                    // Verifica se a vaga está aberta (FALSE) e pertence à empresa
-                    const vagaAberta = fechada === 'FALSE' || fechada === 'false' || fechada === false;
+                    // Verifica se a vaga pertence à empresa
                     const pertenceEmpresa = empresaE === userEmpresa || empresaF === userEmpresa;
                     
-                    if (vagaAberta && pertenceEmpresa) {
-                        vagasCount++;
-                        console.log(`✅ Vaga aberta encontrada: Linha ${i}`, { empresaE, empresaF, fechada });
+                    if (pertenceEmpresa && cargo) {
+                        const vagaAberta = fechada !== 'TRUE' && fechada !== 'true' && fechada !== true;
+                        
+                        if (vagaAberta) {
+                            totalVagasAbertas++;
+                        }
+                        
+                        vagas.push({
+                            abertura: abertura || 'Data não informada',
+                            cargo: cargo || '',
+                            modalidade: modalidade || 'A definir',
+                            status: vagaAberta ? 'Aberta' : 'Fechada',
+                            vagaAberta: vagaAberta,
+                            empresa: empresaE || empresaF || ''
+                        });
                     }
                 }
                 
-                return vagasCount;
+                console.log(`✅ ${vagas.length} vagas encontradas para ${userEmpresa} (${totalVagasAbertas} abertas)`);
                 
-            } catch (error) {
-                console.error('❌ Erro ao contar vagas:', error);
-                return 0;
-            }
-        }
-
-        // Processar dados do Sheets - VERSÃO CORRIGIDA (COLUNA E)
-        function processarDadosSheets(sheetData) {
-            try {
-                // A primeira linha são os cabeçalhos
-                const headers = sheetData[0];
-                console.log('📋 Cabeçalhos encontrados:', headers);
+                // Atualiza estatísticas
+                document.getElementById('totalVagas').textContent = totalVagasAbertas;
                 
-                // CORREÇÃO: A empresa está na coluna E "Nome Cliente"
-                const empresaIndex = headers.indexOf('Nome Cliente'); // COLUNA E
-                const nomeIndex = headers.indexOf('Nome');
-                const funcaoIndex = headers.indexOf('NomeFuncao');
-                const salarioIndex = headers.indexOf('Salario Mes');
-                const cpfIndex = headers.indexOf('CPF');
-                const admissaoIndex = headers.indexOf('Admissao');
-                const vinculoIndex = headers.indexOf('Vinculo');
-                
-                console.log('🎯 Índices das colunas:', {
-                    empresa: empresaIndex,
-                    nome: nomeIndex,
-                    funcao: funcaoIndex,
-                    salario: salarioIndex,
-                    cpf: cpfIndex,
-                    admissao: admissaoIndex,
-                    vinculo: vinculoIndex
-                });
-                
-                console.log(`🔍 Buscando empresa: "${userEmpresa}" na coluna "Nome Cliente"`);
-                
-                // Filtra apenas as linhas da empresa do usuário
-                employees = [];
-                let empresasEncontradas = new Set();
-                
-                for (let i = 1; i < sheetData.length; i++) {
-                    const row = sheetData[i];
-                    const empresaNaLinha = row[empresaIndex];
-                    
-                    if (empresaNaLinha) {
-                        empresasEncontradas.add(empresaNaLinha);
-                        
-                        // DEBUG: Mostrar as primeiras empresas encontradas
-                        if (i < 5) {
-                            console.log(`Linha ${i}: Nome Cliente = "${empresaNaLinha}"`);
-                        }
-                        
-                        // Verifica se a linha é da empresa correta (busca exata)
-                        if (empresaNaLinha.trim() === userEmpresa.trim() && row[nomeIndex] && row[nomeIndex].trim() !== '') {
-                            employees.push({
-                                nome: row[nomeIndex] || '',
-                                funcao: row[funcaoIndex] || '',
-                                salario: converterSalarioBR(row[salarioIndex]), // CORREÇÃO DO SALÁRIO
-                                cpf: row[cpfIndex] || '',
-                                admissao: row[admissaoIndex] || '',
-                                vinculo: row[vinculoIndex] || ''
-                            });
-                        }
-                    }
-                }
-                
-                console.log('🏢 Todas as empresas encontradas na coluna "Nome Cliente":', Array.from(empresasEncontradas));
-                console.log(`✅ ${employees.length} funcionários encontrados para ${userEmpresa}`);
-                
-                // Atualiza a interface
-                atualizarEstatisticas();
-                renderizarTabela();
+                // Renderiza tabela
+                renderizarTabelaVagas();
                 
                 // Esconde loading e mostra tabela
                 document.getElementById('loadingMessage').style.display = 'none';
-                document.getElementById('employeesTable').style.display = 'table';
+                document.getElementById('vagasTable').style.display = 'table';
                 
             } catch (error) {
-                console.error('❌ Erro ao processar dados:', error);
+                console.error('❌ Erro ao processar vagas:', error);
                 document.getElementById('loadingMessage').innerHTML = `
                     <i class="fas fa-exclamation-triangle"></i>
-                    <p>Erro ao processar dados: ${error.message}</p>
-                    <p>Verifique o console para mais detalhes</p>
+                    <p>Erro ao processar vagas: ${error.message}</p>
                 `;
             }
         }
 
-        // Atualizar estatísticas
-        function atualizarEstatisticas() {
-            document.getElementById('totalFuncionarios').textContent = employees.length;
-            // Vagas Abertas já é atualizado pela função carregarVagasAbertas
-        }
-
-        // Renderizar tabela
-        function renderizarTabela() {
-            const tbody = document.getElementById('employeesTableBody');
+        // Renderizar tabela de vagas
+        function renderizarTabelaVagas() {
+            const tbody = document.getElementById('vagasTableBody');
             tbody.innerHTML = '';
 
-            if (employees.length === 0) {
+            if (vagas.length === 0) {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td colspan="6" style="text-align: center; padding: 40px; color: #6c757d;">
-                        <i class="fas fa-users" style="font-size: 32px; margin-bottom: 10px; display: block; color: #dc3545;"></i>
-                        Nenhum funcionário encontrado para ${userEmpresa}
+                    <td colspan="4" style="text-align: center; padding: 40px; color: #6c757d;">
+                        <i class="fas fa-briefcase" style="font-size: 32px; margin-bottom: 10px; display: block; color: #dc3545;"></i>
+                        Nenhuma vaga encontrada para ${userEmpresa}
                     </td>
                 `;
                 tbody.appendChild(row);
                 return;
             }
 
-            employees.forEach(funcionario => {
+            // Ordena por data (mais recentes primeiro)
+            vagas.sort((a, b) => {
+                return new Date(b.abertura) - new Date(a.abertura);
+            });
+
+            vagas.forEach(vaga => {
                 const row = document.createElement('tr');
+                const statusClass = vaga.vagaAberta ? 'vaga-aberta' : 'vaga-fechada';
+                
                 row.innerHTML = `
-                    <td>${funcionario.nome}</td>
-                    <td>${funcionario.funcao}</td>
-                    <td class="salary">R$ ${funcionario.salario.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
-                    <td class="cpf">${funcionario.cpf}</td>
-                    <td class="admission">${funcionario.admissao}</td>
-                    <td>${funcionario.vinculo}</td>
+                    <td>${formatarDataApenasData(vaga.abertura)}</td>
+                    <td>${vaga.cargo}</td>
+                    <td>${vaga.modalidade}</td>
+                    <td class="${statusClass}">${vaga.status}</td>
                 `;
                 tbody.appendChild(row);
             });
         }
 
+        // Função para formatar data (APENAS DATA - ignora hora)
+        function formatarDataApenasData(dataString) {
+            if (!dataString) return 'Data não informada';
+            
+            try {
+                // Extrai apenas a parte da data (antes do espaço)
+                const apenasData = dataString.split(' ')[0];
+                const data = new Date(apenasData);
+                
+                if (isNaN(data.getTime())) {
+                    return dataString; // Retorna original se não for uma data válida
+                }
+                
+                return data.toLocaleDateString('pt-BR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+            } catch (error) {
+                return dataString;
+            }
+        }
+
         // Ordenar tabela
         window.sortTable = function(columnIndex) {
-            const headers = document.querySelectorAll('.employees-table th');
+            const headers = document.querySelectorAll('.vagas-table th');
             const currentHeader = headers[columnIndex];
             
             // Remove ícones de todos os headers
@@ -831,33 +803,25 @@
             icon.className = sortDirection[columnIndex] === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down';
 
             // Ordena os dados
-            employees.sort((a, b) => {
+            vagas.sort((a, b) => {
                 let valueA, valueB;
                 
                 switch(columnIndex) {
-                    case 0: // Nome
-                        valueA = a.nome.toLowerCase();
-                        valueB = b.nome.toLowerCase();
+                    case 0: // Abertura
+                        valueA = new Date(a.abertura.split(' ')[0]); // Pega apenas a data
+                        valueB = new Date(b.abertura.split(' ')[0]);
                         break;
-                    case 1: // Função
-                        valueA = a.funcao.toLowerCase();
-                        valueB = b.funcao.toLowerCase();
+                    case 1: // Cargo
+                        valueA = a.cargo.toLowerCase();
+                        valueB = b.cargo.toLowerCase();
                         break;
-                    case 2: // Salário
-                        valueA = a.salario;
-                        valueB = b.salario;
+                    case 2: // Modalidade
+                        valueA = a.modalidade.toLowerCase();
+                        valueB = b.modalidade.toLowerCase();
                         break;
-                    case 3: // CPF
-                        valueA = a.cpf;
-                        valueB = b.cpf;
-                        break;
-                    case 4: // Admissão
-                        valueA = new Date(a.admissao.split('/').reverse().join('-'));
-                        valueB = new Date(b.admissao.split('/').reverse().join('-'));
-                        break;
-                    case 5: // Vínculo
-                        valueA = a.vinculo.toLowerCase();
-                        valueB = b.vinculo.toLowerCase();
+                    case 3: // Status
+                        valueA = a.status.toLowerCase();
+                        valueB = b.status.toLowerCase();
                         break;
                 }
 
@@ -866,28 +830,48 @@
                 return 0;
             });
 
-            renderizarTabela();
+            renderizarTabelaVagas();
         }
 
-        // Buscar funcionários
+        // Buscar vagas
         document.getElementById('searchInput').addEventListener('input', function(e) {
             const searchTerm = e.target.value.toLowerCase();
             
             if (searchTerm === '') {
-                // Recarrega os dados originais do Google Sheets
-                carregarDadosSheets();
+                renderizarTabelaVagas();
             } else {
-                const filteredEmployees = employees.filter(funcionario => 
-                    funcionario.nome.toLowerCase().includes(searchTerm) ||
-                    funcionario.funcao.toLowerCase().includes(searchTerm) ||
-                    funcionario.cpf.includes(searchTerm) ||
-                    funcionario.vinculo.toLowerCase().includes(searchTerm)
+                const vagasFiltradas = vagas.filter(vaga => 
+                    vaga.cargo.toLowerCase().includes(searchTerm) ||
+                    vaga.modalidade.toLowerCase().includes(searchTerm) ||
+                    vaga.status.toLowerCase().includes(searchTerm)
                 );
                 
-                // Atualiza a tabela com os resultados filtrados
-                employees = filteredEmployees;
-                atualizarEstatisticas();
-                renderizarTabela();
+                const tbody = document.getElementById('vagasTableBody');
+                tbody.innerHTML = '';
+
+                if (vagasFiltradas.length === 0) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td colspan="4" style="text-align: center; padding: 40px; color: #6c757d;">
+                            Nenhuma vaga encontrada para "${searchTerm}"
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                    return;
+                }
+
+                vagasFiltradas.forEach(vaga => {
+                    const row = document.createElement('tr');
+                    const statusClass = vaga.vagaAberta ? 'vaga-aberta' : 'vaga-fechada';
+                    
+                    row.innerHTML = `
+                        <td>${formatarDataApenasData(vaga.abertura)}</td>
+                        <td>${vaga.cargo}</td>
+                        <td>${vaga.modalidade}</td>
+                        <td class="${statusClass}">${vaga.status}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
             }
         });
 

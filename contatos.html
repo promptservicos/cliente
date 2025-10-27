@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contatos - Portal Parceiros Prompt</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-right: 1px solid #ffe6e6;
+            padding: 30px 0;
+            box-shadow: 2px 0 10px rgba(220, 53, 69, 0.05);
+        }
+
+        .logo {
+            padding: 0 30px 30px 30px;
+            border-bottom: 1px solid #f8f9fa;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .logo-img {
+            max-width: 180px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .logo-fallback {
+            color: #dc3545;
+            font-size: 24px;
+            font-weight: 600;
+            display: none;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0 20px;
+        }
+
+        .nav-item {
+            margin-bottom: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: #495057;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background: #fff5f5;
+            color: #dc3545;
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            background: #dc3545;
+            color: white;
+        }
+
+        .nav-icon {
+            margin-right: 12px;
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 25px 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(220, 53, 69, 0.08);
+            border: 1px solid #ffe6e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-center {
+            text-align: center;
+            flex: 1;
+        }
+
+        .header-center h1 {
+            color: #dc3545;
+            font-size: 28px;
+            font-weight: 300;
+            margin-bottom: 5px;
+        }
+
+        .header-center p {
+            color: #6c757d;
+            font-size: 16px;
+        }
+
+        .user-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            border-left: 4px solid #dc3545;
+            min-width: 280px;
+        }
+
+        .user-info {
+            margin-bottom: 15px;
+        }
+
+        .user-name {
+            color: #212529;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .user-role {
+            color: #6c757d;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .user-company {
+            color: #dc3545;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            width: 100%;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+        }
+
+        /* Welcome Message */
+        .welcome-message {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 5px 20px rgba(220, 53, 69, 0.08);
+            border: 1px solid #ffe6e6;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .welcome-icon {
+            font-size: 48px;
+            color: #dc3545;
+            margin-bottom: 20px;
+        }
+
+        .welcome-message h2 {
+            color: #dc3545;
+            font-size: 28px;
+            font-weight: 300;
+            margin-bottom: 15px;
+        }
+
+        .welcome-message p {
+            color: #6c757d;
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        /* Contacts Section */
+        .contacts-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(220, 53, 69, 0.08);
+            border: 1px solid #ffe6e6;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .section-header h2 {
+            color: #dc3545;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-input {
+            padding: 10px 15px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            width: 250px;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #dc3545;
+        }
+
+        .contacts-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .contacts-table th {
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #e9ecef;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .contacts-table th:hover {
+            background: #fff5f5;
+            color: #dc3545;
+        }
+
+        .contacts-table th i {
+            margin-left: 5px;
+            font-size: 12px;
+            opacity: 0.6;
+        }
+
+        .contacts-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            color: #495057;
+        }
+
+        .contacts-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .email {
+            color: #495057;
+            text-decoration: none;
+        }
+
+        .finalidade {
+            color: #6c757d;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #ffe6e6;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            .user-card {
+                min-width: auto;
+                width: 100%;
+            }
+
+            .logo-img {
+                max-width: 150px;
+            }
+
+            .welcome-message {
+                padding: 30px 20px;
+            }
+
+            .section-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            .contacts-table {
+                font-size: 14px;
+            }
+
+            .contacts-table th,
+            .contacts-table td {
+                padding: 10px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+        <div class="logo">
+            <img src="/img/prompt.png" alt="Prompt Serviços" class="logo-img" onerror="this.style.display='none'; document.querySelector('.logo-fallback').style.display='block';">
+            <div class="logo-fallback">Portal Parceiros</div>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="menu.html" class="nav-link">
+                    <i class="nav-icon fas fa-home"></i>
+                    Início
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="funcionarios.html" class="nav-link">
+                    <i class="nav-icon fas fa-users"></i>
+                    Funcionários
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="vagas.html" class="nav-link">
+                    <i class="nav-icon fas fa-briefcase"></i>
+                    Vagas Abertas
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="contatos.html" class="nav-link active">
+                    <i class="nav-icon fas fa-address-book"></i>
+                    Contatos
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-center">
+                <h1>Contatos - Portal Parceiros Prompt</h1>
+                <p>Equipe de suporte e atendimento</p>
+            </div>
+            <div class="user-card">
+                <div class="user-info">
+                    <div class="user-name" id="headerUserName">Carregando...</div>
+                    <div class="user-role" id="headerUserRole">Carregando...</div>
+                    <div class="user-company" id="headerUserCompany">Carregando...</div>
+                </div>
+                <button class="logout-btn" onclick="sair()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Sair do Portal
+                </button>
+            </div>
+        </header>
+
+        <!-- Welcome Message -->
+        <div class="welcome-message">
+            <div class="welcome-icon">
+                <i class="fas fa-address-book"></i>
+            </div>
+            <h2>Contatos da Prompt Serviços</h2>
+            <p>Encontre rapidamente o setor e responsável ideal para sua necessidade</p>
+        </div>
+
+        <!-- Contacts Table -->
+        <section class="contacts-section">
+            <div class="section-header">
+                <h2>Lista de Contatos</h2>
+                <div class="search-box">
+                    <input type="text" class="search-input" id="searchInput" placeholder="Buscar contato...">
+                </div>
+            </div>
+
+            <table class="contacts-table">
+                <thead>
+                    <tr>
+                        <th onclick="sortTable(0)">
+                            Setor <i class="fas fa-sort"></i>
+                        </th>
+                        <th onclick="sortTable(1)">
+                            Responsável <i class="fas fa-sort"></i>
+                        </th>
+                        <th onclick="sortTable(2)">
+                            E-mail <i class="fas fa-sort"></i>
+                        </th>
+                        <th onclick="sortTable(3)">
+                            Finalidade <i class="fas fa-sort"></i>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="contactsTableBody">
+                    <!-- Contatos serão preenchidos via JavaScript -->
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDWyX6DXg5APApHznIwe_4l6W_D9HA7_JI",
+            authDomain: "clientes-prompt-e83cb.firebaseapp.com",
+            projectId: "clientes-prompt-e83cb",
+            storageBucket: "clientes-prompt-e83cb.firebasestorage.app",
+            messagingSenderId: "36358707713",
+            appId: "1:36358707713:web:a3d97276a327123233fe00"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        let contacts = [];
+        let sortDirection = {};
+        let userEmpresa = '';
+
+        // Dados dos contatos
+        const contatosPrompt = [
+            {
+                setor: "Diretor de Projetos",
+                responsavel: "Fábio Mansur",
+                email: "fabiomansur@promptservicos.com.br",
+                finalidade: "Projetos, alinhamentos estratégicos e diretoria"
+            },
+            {
+                setor: "Gerente Administrativa", 
+                responsavel: "Luana",
+                email: "luana@promptservicos.com.br",
+                finalidade: "Demandas administrativas gerais"
+            },
+            {
+                setor: "Administrativo Geral",
+                responsavel: "",
+                email: "adm@promptservicos.com.br", 
+                finalidade: "Suporte administrativo interno e operacional"
+            },
+            {
+                setor: "Gerente Financeira",
+                responsavel: "Márcia",
+                email: "marcia@promptservicos.com.br",
+                finalidade: "Assuntos financeiros estratégicos"
+            },
+            {
+                setor: "Financeiro",
+                responsavel: "",
+                email: "financeiro@promptservicos.com.br",
+                finalidade: "Boletos, pagamentos e cobranças"
+            },
+            {
+                setor: "Recursos Humanos",
+                responsavel: "", 
+                email: "rh@promptservicos.com.br",
+                finalidade: "Andamentos de vagas, documentações e integrações"
+            },
+            {
+                setor: "Abertura de Vagas e Solicitações de Colaboradores",
+                responsavel: "",
+                email: "vagas@promptservicos.com.br",
+                finalidade: "Solicitação de novas vagas, substituições e reforços de equipes"
+            },
+            {
+                setor: "Comercial",
+                responsavel: "Leila",
+                email: "comercial1@promptservicos.com.br",
+                finalidade: "Propostas comerciais e negociações"
+            }
+        ];
+
+        // Verificar autenticação
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = "index.html";
+            } else {
+                currentUser = user;
+                carregarDadosUsuario(user);
+            }
+        });
+
+        // Carregar dados do usuário
+        async function carregarDadosUsuario(user) {
+            try {
+                const userDoc = await getDoc(doc(db, 'usuarios', user.uid));
+                
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    
+                    document.getElementById('headerUserName').textContent = userData.nome;
+                    document.getElementById('headerUserRole').textContent = userData.cargo;
+                    document.getElementById('headerUserCompany').textContent = userData.empresa;
+                    
+                    userEmpresa = userData.empresa;
+                    
+                    // Carrega apenas os contatos
+                    carregarContatos();
+                    
+                } else {
+                    document.getElementById('headerUserName').textContent = 'Usuário não cadastrado';
+                    document.getElementById('headerUserRole').textContent = 'Contate o administrador';
+                    document.getElementById('headerUserCompany').textContent = 'Prompt Serviços';
+                }
+            } catch (error) {
+                console.error('Erro ao carregar dados:', error);
+                document.getElementById('headerUserName').textContent = 'Erro ao carregar';
+                document.getElementById('headerUserRole').textContent = 'Tente novamente';
+                document.getElementById('headerUserCompany').textContent = 'Prompt Serviços';
+            }
+        }
+
+        // Carregar contatos
+        function carregarContatos() {
+            contacts = [...contatosPrompt];
+            renderizarTabelaContatos();
+        }
+
+        // Renderizar tabela de contatos
+        function renderizarTabelaContatos() {
+            const tbody = document.getElementById('contactsTableBody');
+            tbody.innerHTML = '';
+
+            contacts.forEach(contato => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${contato.setor}</td>
+                    <td>${contato.responsavel}</td>
+                    <td>
+                        <a href="mailto:${contato.email}" class="email">
+                            ${contato.email}
+                        </a>
+                    </td>
+                    <td class="finalidade">${contato.finalidade}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Ordenar tabela
+        window.sortTable = function(columnIndex) {
+            const headers = document.querySelectorAll('.contacts-table th');
+            const currentHeader = headers[columnIndex];
+            
+            // Remove ícones de todos os headers
+            headers.forEach(header => {
+                const icon = header.querySelector('i');
+                if (icon) {
+                    icon.className = 'fas fa-sort';
+                }
+            });
+
+            // Define direção da ordenação
+            if (!sortDirection[columnIndex]) {
+                sortDirection[columnIndex] = 'asc';
+            } else {
+                sortDirection[columnIndex] = sortDirection[columnIndex] === 'asc' ? 'desc' : 'asc';
+            }
+
+            // Atualiza ícone
+            const icon = currentHeader.querySelector('i');
+            icon.className = sortDirection[columnIndex] === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down';
+
+            // Ordena os dados
+            contacts.sort((a, b) => {
+                let valueA, valueB;
+                
+                switch(columnIndex) {
+                    case 0: // Setor
+                        valueA = a.setor.toLowerCase();
+                        valueB = b.setor.toLowerCase();
+                        break;
+                    case 1: // Responsável
+                        valueA = a.responsavel.toLowerCase();
+                        valueB = b.responsavel.toLowerCase();
+                        break;
+                    case 2: // E-mail
+                        valueA = a.email.toLowerCase();
+                        valueB = b.email.toLowerCase();
+                        break;
+                    case 3: // Finalidade
+                        valueA = a.finalidade.toLowerCase();
+                        valueB = b.finalidade.toLowerCase();
+                        break;
+                }
+
+                if (valueA < valueB) return sortDirection[columnIndex] === 'asc' ? -1 : 1;
+                if (valueA > valueB) return sortDirection[columnIndex] === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            renderizarTabelaContatos();
+        }
+
+        // Buscar contatos
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            
+            if (searchTerm === '') {
+                contacts = [...contatosPrompt];
+            } else {
+                contacts = contatosPrompt.filter(contato => 
+                    contato.setor.toLowerCase().includes(searchTerm) ||
+                    contato.responsavel.toLowerCase().includes(searchTerm) ||
+                    contato.email.toLowerCase().includes(searchTerm) ||
+                    contato.finalidade.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            renderizarTabelaContatos();
+        });
+
+        // Sair
+        window.sair = function() {
+            signOut(auth).then(() => {
+                window.location.href = "index.html";
+            });
+        }
+
+        // Navegação da sidebar
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
