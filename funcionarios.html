@@ -218,7 +218,7 @@
             font-weight: 500;
         }
 
-        /* Employees Table */
+        /* Employees Section */
         .employees-section {
             background: white;
             border-radius: 20px;
@@ -258,6 +258,7 @@
             border-color: #dc3545;
         }
 
+        /* Employees Table - VISÍVEL NO DESKTOP */
         .employees-table {
             width: 100%;
             border-collapse: collapse;
@@ -325,25 +326,7 @@
 
         /* ========== APENAS PARA MOBILE ========== */
         
-        /* Mobile Menu Toggle - Só aparece no mobile */
-        .mobile-menu-toggle {
-            display: none;
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 1000;
-            background: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            width: 44px;
-            height: 44px;
-            font-size: 20px;
-            cursor: pointer;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        /* Employees Cards - Só aparece no mobile */
+        /* Employees Cards - ESCONDIDO NO DESKTOP */
         .employees-cards {
             display: none;
             flex-direction: column;
@@ -404,22 +387,6 @@
             color: #28a745;
         }
 
-        /* Overlay for mobile menu - Só aparece no mobile */
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 998;
-        }
-        
-        .sidebar-overlay.active {
-            display: block;
-        }
-
         /* ========== RESPONSIVE - APENAS MOBILE ========== */
         @media (max-width: 768px) {
             /* Layout mobile */
@@ -432,8 +399,6 @@
                 width: 100%;
                 border-right: none;
                 border-bottom: 1px solid #ffe6e6;
-                position: static;
-                transform: none;
             }
             
             /* Header mobile */
@@ -466,12 +431,12 @@
                 width: 100%;
             }
 
-            /* Tabela - esconder no mobile */
+            /* Tabela - ESCONDER no mobile */
             .employees-table {
                 display: none;
             }
             
-            /* Cards - mostrar no mobile */
+            /* Cards - MOSTRAR no mobile */
             .employees-cards {
                 display: flex;
             }
@@ -630,7 +595,7 @@
                 <p>Carregando dados do Google Sheets...</p>
             </div>
 
-            <!-- Desktop Table - Visível por padrão -->
+            <!-- Desktop Table - Visível por padrão no desktop -->
             <table class="employees-table" id="employeesTable" style="display: none;">
                 <thead>
                     <tr>
@@ -659,7 +624,7 @@
                 </tbody>
             </table>
 
-            <!-- Mobile Cards - Escondido por padrão -->
+            <!-- Mobile Cards - Escondido por padrão no desktop -->
             <div class="employees-cards" id="employeesCards">
                 <!-- Dados serão preenchidos via JavaScript -->
             </div>
@@ -928,12 +893,10 @@
                 
                 // Atualiza a interface
                 atualizarEstatisticas();
-                renderizarTabela();
-                renderizarCards();
+                renderizarConteudo();
                 
-                // Esconde loading e mostra tabela/cards
+                // Esconde loading
                 document.getElementById('loadingMessage').style.display = 'none';
-                document.getElementById('employeesTable').style.display = 'table';
                 
             } catch (error) {
                 console.error('❌ Erro ao processar dados:', error);
@@ -949,6 +912,21 @@
         function atualizarEstatisticas() {
             document.getElementById('totalFuncionarios').textContent = employees.length;
             // Vagas Abertas já é atualizado pela função carregarVagasAbertas
+        }
+
+        // Renderizar conteúdo conforme o dispositivo
+        function renderizarConteudo() {
+            if (window.innerWidth > 768) {
+                // Desktop - mostrar tabela
+                renderizarTabela();
+                document.getElementById('employeesTable').style.display = 'table';
+                document.getElementById('employeesCards').style.display = 'none';
+            } else {
+                // Mobile - mostrar cards
+                renderizarCards();
+                document.getElementById('employeesTable').style.display = 'none';
+                document.getElementById('employeesCards').style.display = 'flex';
+            }
         }
 
         // Renderizar tabela (Desktop)
@@ -984,9 +962,6 @@
 
         // Renderizar cards (Mobile)
         function renderizarCards() {
-            // Só renderiza cards se estiver em mobile
-            if (window.innerWidth > 768) return;
-            
             const cardsContainer = document.getElementById('employeesCards');
             cardsContainer.innerHTML = '';
 
@@ -1093,8 +1068,7 @@
                 return 0;
             });
 
-            renderizarTabela();
-            renderizarCards();
+            renderizarConteudo();
         }
 
         // Buscar funcionários
@@ -1115,8 +1089,7 @@
                 // Atualiza a tabela com os resultados filtrados
                 employees = filteredEmployees;
                 atualizarEstatisticas();
-                renderizarTabela();
-                renderizarCards();
+                renderizarConteudo();
             }
         });
 
@@ -1135,9 +1108,9 @@
             });
         });
 
-        // Redimensionamento da janela - atualizar cards se necessário
+        // Redimensionamento da janela - atualizar conteúdo conforme necessário
         window.addEventListener('resize', function() {
-            renderizarCards();
+            renderizarConteudo();
         });
     </script>
 </body>
