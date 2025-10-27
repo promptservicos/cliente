@@ -245,6 +245,7 @@
             border-color: #dc3545;
         }
 
+        /* Contacts Table - VISÍVEL NO DESKTOP */
         .contacts-table {
             width: 100%;
             border-collapse: collapse;
@@ -294,18 +295,93 @@
             line-height: 1.4;
         }
 
-        /* Responsive */
+        /* ========== APENAS PARA MOBILE ========== */
+        
+        /* Contacts Cards - ESCONDIDO NO DESKTOP */
+        .contacts-cards {
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .contact-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            border: 1px solid #e9ecef;
+        }
+
+        .contact-card-header {
+            display: flex;
+            justify-content: between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .contact-setor {
+            font-weight: 600;
+            color: #212529;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .contact-responsavel {
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .contact-details {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .contact-detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .contact-detail-label {
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 4px;
+        }
+
+        .contact-detail-value {
+            font-size: 14px;
+            color: #212529;
+            font-weight: 500;
+        }
+
+        .contact-detail-value.email {
+            color: #495057;
+        }
+
+        .contact-finalidade {
+            color: #6c757d;
+            font-size: 14px;
+            line-height: 1.4;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        /* ========== RESPONSIVE - APENAS MOBILE ========== */
         @media (max-width: 768px) {
+            /* Layout mobile */
             body {
                 flex-direction: column;
             }
             
+            /* Sidebar mobile */
             .sidebar {
                 width: 100%;
                 border-right: none;
                 border-bottom: 1px solid #ffe6e6;
             }
             
+            /* Header mobile */
             .header {
                 flex-direction: column;
                 gap: 20px;
@@ -339,13 +415,68 @@
                 width: 100%;
             }
 
+            /* Tabela - ESCONDER no mobile */
             .contacts-table {
-                font-size: 14px;
+                display: none;
             }
+            
+            /* Cards - MOSTRAR no mobile */
+            .contacts-cards {
+                display: flex;
+            }
+            
+            /* Ajustes de tamanho mobile */
+            .main-content {
+                padding: 15px;
+            }
+            
+            .header {
+                padding: 20px;
+                border-radius: 15px;
+            }
+            
+            .header-center h1 {
+                font-size: 22px;
+            }
+            
+            .contacts-section {
+                padding: 20px;
+                border-radius: 15px;
+            }
+            
+            .section-header h2 {
+                font-size: 20px;
+            }
+        }
 
-            .contacts-table th,
-            .contacts-table td {
-                padding: 10px 8px;
+        @media (max-width: 480px) {
+            /* Ajustes para telas muito pequenas */
+            .header-center h1 {
+                font-size: 20px;
+            }
+            
+            .user-card {
+                padding: 15px;
+            }
+            
+            .contacts-section {
+                padding: 15px;
+            }
+            
+            .contact-card {
+                padding: 15px;
+            }
+            
+            .welcome-message {
+                padding: 25px 15px;
+            }
+            
+            .welcome-message h2 {
+                font-size: 24px;
+            }
+            
+            .welcome-message p {
+                font-size: 16px;
             }
         }
     </style>
@@ -415,7 +546,7 @@
             <p>Encontre rapidamente o setor e responsável ideal para sua necessidade</p>
         </div>
 
-        <!-- Contacts Table -->
+        <!-- Contacts Section -->
         <section class="contacts-section">
             <div class="section-header">
                 <h2>Lista de Contatos</h2>
@@ -424,7 +555,8 @@
                 </div>
             </div>
 
-            <table class="contacts-table">
+            <!-- Desktop Table - Visível por padrão no desktop -->
+            <table class="contacts-table" id="contactsTable">
                 <thead>
                     <tr>
                         <th onclick="sortTable(0)">
@@ -445,6 +577,11 @@
                     <!-- Contatos serão preenchidos via JavaScript -->
                 </tbody>
             </table>
+
+            <!-- Mobile Cards - Escondido por padrão no desktop -->
+            <div class="contacts-cards" id="contactsCards">
+                <!-- Contatos serão preenchidos via JavaScript -->
+            </div>
         </section>
     </main>
 
@@ -567,10 +704,25 @@
         // Carregar contatos
         function carregarContatos() {
             contacts = [...contatosPrompt];
-            renderizarTabelaContatos();
+            renderizarConteudo();
         }
 
-        // Renderizar tabela de contatos
+        // Renderizar conteúdo conforme o dispositivo
+        function renderizarConteudo() {
+            if (window.innerWidth > 768) {
+                // Desktop - mostrar tabela
+                renderizarTabelaContatos();
+                document.getElementById('contactsTable').style.display = 'table';
+                document.getElementById('contactsCards').style.display = 'none';
+            } else {
+                // Mobile - mostrar cards
+                renderizarCardsContatos();
+                document.getElementById('contactsTable').style.display = 'none';
+                document.getElementById('contactsCards').style.display = 'flex';
+            }
+        }
+
+        // Renderizar tabela de contatos (Desktop)
         function renderizarTabelaContatos() {
             const tbody = document.getElementById('contactsTableBody');
             tbody.innerHTML = '';
@@ -588,6 +740,36 @@
                     <td class="finalidade">${contato.finalidade}</td>
                 `;
                 tbody.appendChild(row);
+            });
+        }
+
+        // Renderizar cards de contatos (Mobile)
+        function renderizarCardsContatos() {
+            const cardsContainer = document.getElementById('contactsCards');
+            cardsContainer.innerHTML = '';
+
+            contacts.forEach(contato => {
+                const card = document.createElement('div');
+                card.className = 'contact-card';
+                
+                card.innerHTML = `
+                    <div class="contact-card-header">
+                        <div>
+                            <div class="contact-setor">${contato.setor}</div>
+                            <div class="contact-responsavel">${contato.responsavel || 'Responsável não definido'}</div>
+                        </div>
+                    </div>
+                    <div class="contact-details">
+                        <div class="contact-detail-item">
+                            <span class="contact-detail-label">E-mail</span>
+                            <a href="mailto:${contato.email}" class="contact-detail-value email">
+                                ${contato.email}
+                            </a>
+                        </div>
+                    </div>
+                    <div class="contact-finalidade">${contato.finalidade}</div>
+                `;
+                cardsContainer.appendChild(card);
             });
         }
 
@@ -643,7 +825,7 @@
                 return 0;
             });
 
-            renderizarTabelaContatos();
+            renderizarConteudo();
         }
 
         // Buscar contatos
@@ -661,7 +843,7 @@
                 );
             }
             
-            renderizarTabelaContatos();
+            renderizarConteudo();
         });
 
         // Sair
@@ -677,6 +859,11 @@
                 document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
                 this.classList.add('active');
             });
+        });
+
+        // Redimensionamento da janela - atualizar conteúdo conforme necessário
+        window.addEventListener('resize', function() {
+            renderizarConteudo();
         });
     </script>
 </body>
