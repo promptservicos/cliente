@@ -323,18 +323,120 @@
             color: #dc3545;
         }
 
-        /* Responsive */
+        /* ========== APENAS PARA MOBILE ========== */
+        
+        /* Mobile Menu Toggle - Só aparece no mobile */
+        .mobile-menu-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            width: 44px;
+            height: 44px;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        /* Employees Cards - Só aparece no mobile */
+        .employees-cards {
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .employee-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            border: 1px solid #e9ecef;
+        }
+
+        .employee-card-header {
+            display: flex;
+            justify-content: between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .employee-name {
+            font-weight: 600;
+            color: #212529;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .employee-role {
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .employee-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 4px;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            color: #212529;
+            font-weight: 500;
+        }
+
+        .detail-value.salary {
+            color: #28a745;
+        }
+
+        /* Overlay for mobile menu - Só aparece no mobile */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 998;
+        }
+        
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        /* ========== RESPONSIVE - APENAS MOBILE ========== */
         @media (max-width: 768px) {
+            /* Layout mobile */
             body {
                 flex-direction: column;
             }
             
+            /* Sidebar mobile */
             .sidebar {
                 width: 100%;
                 border-right: none;
                 border-bottom: 1px solid #ffe6e6;
+                position: static;
+                transform: none;
             }
             
+            /* Header mobile */
             .header {
                 flex-direction: column;
                 gap: 20px;
@@ -350,10 +452,12 @@
                 max-width: 150px;
             }
 
+            /* Stats cards mobile */
             .stats-cards {
                 grid-template-columns: 1fr;
             }
 
+            /* Search box mobile */
             .search-box {
                 flex-direction: column;
             }
@@ -362,13 +466,78 @@
                 width: 100%;
             }
 
+            /* Tabela - esconder no mobile */
             .employees-table {
-                font-size: 14px;
+                display: none;
             }
+            
+            /* Cards - mostrar no mobile */
+            .employees-cards {
+                display: flex;
+            }
+            
+            .employee-details {
+                grid-template-columns: 1fr;
+            }
+            
+            /* Ajustes de tamanho mobile */
+            .stat-card {
+                padding: 20px;
+            }
+            
+            .stat-number {
+                font-size: 28px;
+            }
+            
+            .main-content {
+                padding: 15px;
+            }
+            
+            .header {
+                padding: 20px;
+                border-radius: 15px;
+            }
+            
+            .header-center h1 {
+                font-size: 22px;
+            }
+            
+            .employees-section {
+                padding: 20px;
+                border-radius: 15px;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .section-header h2 {
+                font-size: 20px;
+            }
+        }
 
-            .employees-table th,
-            .employees-table td {
-                padding: 10px 8px;
+        @media (max-width: 480px) {
+            /* Ajustes para telas muito pequenas */
+            .header-center h1 {
+                font-size: 20px;
+            }
+            
+            .user-card {
+                padding: 15px;
+            }
+            
+            .employees-section {
+                padding: 15px;
+            }
+            
+            .employee-card {
+                padding: 15px;
+            }
+            
+            .stat-card {
+                padding: 15px;
             }
         }
     </style>
@@ -447,7 +616,7 @@
             </div>
         </div>
 
-        <!-- Employees Table -->
+        <!-- Employees Section -->
         <section class="employees-section">
             <div class="section-header">
                 <h2>Lista de Funcionários - <span id="empresaNome">AEROVIP</span></h2>
@@ -461,6 +630,7 @@
                 <p>Carregando dados do Google Sheets...</p>
             </div>
 
+            <!-- Desktop Table - Visível por padrão -->
             <table class="employees-table" id="employeesTable" style="display: none;">
                 <thead>
                     <tr>
@@ -488,6 +658,11 @@
                     <!-- Dados serão preenchidos via JavaScript -->
                 </tbody>
             </table>
+
+            <!-- Mobile Cards - Escondido por padrão -->
+            <div class="employees-cards" id="employeesCards">
+                <!-- Dados serão preenchidos via JavaScript -->
+            </div>
         </section>
     </main>
 
@@ -754,8 +929,9 @@
                 // Atualiza a interface
                 atualizarEstatisticas();
                 renderizarTabela();
+                renderizarCards();
                 
-                // Esconde loading e mostra tabela
+                // Esconde loading e mostra tabela/cards
                 document.getElementById('loadingMessage').style.display = 'none';
                 document.getElementById('employeesTable').style.display = 'table';
                 
@@ -775,7 +951,7 @@
             // Vagas Abertas já é atualizado pela função carregarVagasAbertas
         }
 
-        // Renderizar tabela
+        // Renderizar tabela (Desktop)
         function renderizarTabela() {
             const tbody = document.getElementById('employeesTableBody');
             tbody.innerHTML = '';
@@ -803,6 +979,57 @@
                     <td>${funcionario.vinculo}</td>
                 `;
                 tbody.appendChild(row);
+            });
+        }
+
+        // Renderizar cards (Mobile)
+        function renderizarCards() {
+            // Só renderiza cards se estiver em mobile
+            if (window.innerWidth > 768) return;
+            
+            const cardsContainer = document.getElementById('employeesCards');
+            cardsContainer.innerHTML = '';
+
+            if (employees.length === 0) {
+                cardsContainer.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #6c757d;">
+                        <i class="fas fa-users" style="font-size: 32px; margin-bottom: 10px; display: block; color: #dc3545;"></i>
+                        Nenhum funcionário encontrado para ${userEmpresa}
+                    </div>
+                `;
+                return;
+            }
+
+            employees.forEach(funcionario => {
+                const card = document.createElement('div');
+                card.className = 'employee-card';
+                card.innerHTML = `
+                    <div class="employee-card-header">
+                        <div>
+                            <div class="employee-name">${funcionario.nome}</div>
+                            <div class="employee-role">${funcionario.funcao}</div>
+                        </div>
+                    </div>
+                    <div class="employee-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Salário</span>
+                            <span class="detail-value salary">R$ ${funcionario.salario.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">CPF</span>
+                            <span class="detail-value">${funcionario.cpf}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Admissão</span>
+                            <span class="detail-value">${funcionario.admissao}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Vínculo</span>
+                            <span class="detail-value">${funcionario.vinculo}</span>
+                        </div>
+                    </div>
+                `;
+                cardsContainer.appendChild(card);
             });
         }
 
@@ -867,6 +1094,7 @@
             });
 
             renderizarTabela();
+            renderizarCards();
         }
 
         // Buscar funcionários
@@ -888,6 +1116,7 @@
                 employees = filteredEmployees;
                 atualizarEstatisticas();
                 renderizarTabela();
+                renderizarCards();
             }
         });
 
@@ -904,6 +1133,11 @@
                 document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
                 this.classList.add('active');
             });
+        });
+
+        // Redimensionamento da janela - atualizar cards se necessário
+        window.addEventListener('resize', function() {
+            renderizarCards();
         });
     </script>
 </body>
