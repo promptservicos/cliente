@@ -218,7 +218,7 @@
             font-weight: 500;
         }
 
-        /* Vagas Table */
+        /* Vagas Section */
         .vagas-section {
             background: white;
             border-radius: 20px;
@@ -258,6 +258,7 @@
             border-color: #dc3545;
         }
 
+        /* Vagas Table - VISÍVEL NO DESKTOP */
         .vagas-table {
             width: 100%;
             border-collapse: collapse;
@@ -318,18 +319,88 @@
             color: #dc3545;
         }
 
-        /* Responsive */
+        /* ========== APENAS PARA MOBILE ========== */
+        
+        /* Vagas Cards - ESCONDIDO NO DESKTOP */
+        .vagas-cards {
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .vaga-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            border: 1px solid #e9ecef;
+        }
+
+        .vaga-card-header {
+            display: flex;
+            justify-content: between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .vaga-cargo {
+            font-weight: 600;
+            color: #212529;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .vaga-data {
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .vaga-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .vaga-detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .vaga-detail-label {
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 4px;
+        }
+
+        .vaga-detail-value {
+            font-size: 14px;
+            color: #212529;
+            font-weight: 500;
+        }
+
+        .vaga-detail-value.aberta {
+            color: #28a745;
+        }
+
+        .vaga-detail-value.fechada {
+            color: #dc3545;
+        }
+
+        /* ========== RESPONSIVE - APENAS MOBILE ========== */
         @media (max-width: 768px) {
+            /* Layout mobile */
             body {
                 flex-direction: column;
             }
             
+            /* Sidebar mobile */
             .sidebar {
                 width: 100%;
                 border-right: none;
                 border-bottom: 1px solid #ffe6e6;
             }
             
+            /* Header mobile */
             .header {
                 flex-direction: column;
                 gap: 20px;
@@ -345,10 +416,12 @@
                 max-width: 150px;
             }
 
+            /* Stats cards mobile */
             .stats-cards {
                 grid-template-columns: 1fr;
             }
 
+            /* Search box mobile */
             .search-box {
                 flex-direction: column;
             }
@@ -357,13 +430,78 @@
                 width: 100%;
             }
 
+            /* Tabela - ESCONDER no mobile */
             .vagas-table {
-                font-size: 14px;
+                display: none;
             }
+            
+            /* Cards - MOSTRAR no mobile */
+            .vagas-cards {
+                display: flex;
+            }
+            
+            .vaga-details {
+                grid-template-columns: 1fr;
+            }
+            
+            /* Ajustes de tamanho mobile */
+            .stat-card {
+                padding: 20px;
+            }
+            
+            .stat-number {
+                font-size: 28px;
+            }
+            
+            .main-content {
+                padding: 15px;
+            }
+            
+            .header {
+                padding: 20px;
+                border-radius: 15px;
+            }
+            
+            .header-center h1 {
+                font-size: 22px;
+            }
+            
+            .vagas-section {
+                padding: 20px;
+                border-radius: 15px;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .section-header h2 {
+                font-size: 20px;
+            }
+        }
 
-            .vagas-table th,
-            .vagas-table td {
-                padding: 10px 8px;
+        @media (max-width: 480px) {
+            /* Ajustes para telas muito pequenas */
+            .header-center h1 {
+                font-size: 20px;
+            }
+            
+            .user-card {
+                padding: 15px;
+            }
+            
+            .vagas-section {
+                padding: 15px;
+            }
+            
+            .vaga-card {
+                padding: 15px;
+            }
+            
+            .stat-card {
+                padding: 15px;
             }
         }
     </style>
@@ -442,7 +580,7 @@
             </div>
         </div>
 
-        <!-- Vagas Table -->
+        <!-- Vagas Section -->
         <section class="vagas-section">
             <div class="section-header">
                 <h2>Lista de Vagas - <span id="empresaNome">AEROVIP</span></h2>
@@ -456,6 +594,7 @@
                 <p>Carregando dados do Google Sheets...</p>
             </div>
 
+            <!-- Desktop Table - Visível por padrão no desktop -->
             <table class="vagas-table" id="vagasTable" style="display: none;">
                 <thead>
                     <tr>
@@ -477,6 +616,11 @@
                     <!-- Dados serão preenchidos via JavaScript -->
                 </tbody>
             </table>
+
+            <!-- Mobile Cards - Escondido por padrão no desktop -->
+            <div class="vagas-cards" id="vagasCards">
+                <!-- Dados serão preenchidos via JavaScript -->
+            </div>
         </section>
     </main>
 
@@ -703,12 +847,11 @@
                 // Atualiza estatísticas
                 document.getElementById('totalVagas').textContent = totalVagasAbertas;
                 
-                // Renderiza tabela
-                renderizarTabelaVagas();
+                // Renderiza conteúdo conforme dispositivo
+                renderizarConteudo();
                 
-                // Esconde loading e mostra tabela
+                // Esconde loading
                 document.getElementById('loadingMessage').style.display = 'none';
-                document.getElementById('vagasTable').style.display = 'table';
                 
             } catch (error) {
                 console.error('❌ Erro ao processar vagas:', error);
@@ -719,7 +862,22 @@
             }
         }
 
-        // Renderizar tabela de vagas
+        // Renderizar conteúdo conforme o dispositivo
+        function renderizarConteudo() {
+            if (window.innerWidth > 768) {
+                // Desktop - mostrar tabela
+                renderizarTabelaVagas();
+                document.getElementById('vagasTable').style.display = 'table';
+                document.getElementById('vagasCards').style.display = 'none';
+            } else {
+                // Mobile - mostrar cards
+                renderizarCardsVagas();
+                document.getElementById('vagasTable').style.display = 'none';
+                document.getElementById('vagasCards').style.display = 'flex';
+            }
+        }
+
+        // Renderizar tabela de vagas (Desktop)
         function renderizarTabelaVagas() {
             const tbody = document.getElementById('vagasTableBody');
             tbody.innerHTML = '';
@@ -752,6 +910,53 @@
                     <td class="${statusClass}">${vaga.status}</td>
                 `;
                 tbody.appendChild(row);
+            });
+        }
+
+        // Renderizar cards de vagas (Mobile)
+        function renderizarCardsVagas() {
+            const cardsContainer = document.getElementById('vagasCards');
+            cardsContainer.innerHTML = '';
+
+            if (vagas.length === 0) {
+                cardsContainer.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #6c757d;">
+                        <i class="fas fa-briefcase" style="font-size: 32px; margin-bottom: 10px; display: block; color: #dc3545;"></i>
+                        Nenhuma vaga encontrada para ${userEmpresa}
+                    </div>
+                `;
+                return;
+            }
+
+            // Ordena por data (mais recentes primeiro)
+            vagas.sort((a, b) => {
+                return new Date(b.abertura) - new Date(a.abertura);
+            });
+
+            vagas.forEach(vaga => {
+                const card = document.createElement('div');
+                card.className = 'vaga-card';
+                const statusClass = vaga.vagaAberta ? 'aberta' : 'fechada';
+                
+                card.innerHTML = `
+                    <div class="vaga-card-header">
+                        <div>
+                            <div class="vaga-cargo">${vaga.cargo}</div>
+                            <div class="vaga-data">${formatarDataApenasData(vaga.abertura)}</div>
+                        </div>
+                    </div>
+                    <div class="vaga-details">
+                        <div class="vaga-detail-item">
+                            <span class="vaga-detail-label">Modalidade</span>
+                            <span class="vaga-detail-value">${vaga.modalidade}</span>
+                        </div>
+                        <div class="vaga-detail-item">
+                            <span class="vaga-detail-label">Status</span>
+                            <span class="vaga-detail-value ${statusClass}">${vaga.status}</span>
+                        </div>
+                    </div>
+                `;
+                cardsContainer.appendChild(card);
             });
         }
 
@@ -830,7 +1035,7 @@
                 return 0;
             });
 
-            renderizarTabelaVagas();
+            renderizarConteudo();
         }
 
         // Buscar vagas
@@ -838,7 +1043,7 @@
             const searchTerm = e.target.value.toLowerCase();
             
             if (searchTerm === '') {
-                renderizarTabelaVagas();
+                renderizarConteudo();
             } else {
                 const vagasFiltradas = vagas.filter(vaga => 
                     vaga.cargo.toLowerCase().includes(searchTerm) ||
@@ -846,32 +1051,74 @@
                     vaga.status.toLowerCase().includes(searchTerm)
                 );
                 
-                const tbody = document.getElementById('vagasTableBody');
-                tbody.innerHTML = '';
+                if (window.innerWidth > 768) {
+                    // Desktop - atualizar tabela
+                    const tbody = document.getElementById('vagasTableBody');
+                    tbody.innerHTML = '';
 
-                if (vagasFiltradas.length === 0) {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td colspan="4" style="text-align: center; padding: 40px; color: #6c757d;">
-                            Nenhuma vaga encontrada para "${searchTerm}"
-                        </td>
-                    `;
-                    tbody.appendChild(row);
-                    return;
+                    if (vagasFiltradas.length === 0) {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td colspan="4" style="text-align: center; padding: 40px; color: #6c757d;">
+                                Nenhuma vaga encontrada para "${searchTerm}"
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                        return;
+                    }
+
+                    vagasFiltradas.forEach(vaga => {
+                        const row = document.createElement('tr');
+                        const statusClass = vaga.vagaAberta ? 'vaga-aberta' : 'vaga-fechada';
+                        
+                        row.innerHTML = `
+                            <td>${formatarDataApenasData(vaga.abertura)}</td>
+                            <td>${vaga.cargo}</td>
+                            <td>${vaga.modalidade}</td>
+                            <td class="${statusClass}">${vaga.status}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                } else {
+                    // Mobile - atualizar cards
+                    const cardsContainer = document.getElementById('vagasCards');
+                    cardsContainer.innerHTML = '';
+
+                    if (vagasFiltradas.length === 0) {
+                        cardsContainer.innerHTML = `
+                            <div style="text-align: center; padding: 40px; color: #6c757d;">
+                                Nenhuma vaga encontrada para "${searchTerm}"
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    vagasFiltradas.forEach(vaga => {
+                        const card = document.createElement('div');
+                        card.className = 'vaga-card';
+                        const statusClass = vaga.vagaAberta ? 'aberta' : 'fechada';
+                        
+                        card.innerHTML = `
+                            <div class="vaga-card-header">
+                                <div>
+                                    <div class="vaga-cargo">${vaga.cargo}</div>
+                                    <div class="vaga-data">${formatarDataApenasData(vaga.abertura)}</div>
+                                </div>
+                            </div>
+                            <div class="vaga-details">
+                                <div class="vaga-detail-item">
+                                    <span class="vaga-detail-label">Modalidade</span>
+                                    <span class="vaga-detail-value">${vaga.modalidade}</span>
+                                </div>
+                                <div class="vaga-detail-item">
+                                    <span class="vaga-detail-label">Status</span>
+                                    <span class="vaga-detail-value ${statusClass}">${vaga.status}</span>
+                                </div>
+                            </div>
+                        `;
+                        cardsContainer.appendChild(card);
+                    });
                 }
-
-                vagasFiltradas.forEach(vaga => {
-                    const row = document.createElement('tr');
-                    const statusClass = vaga.vagaAberta ? 'vaga-aberta' : 'vaga-fechada';
-                    
-                    row.innerHTML = `
-                        <td>${formatarDataApenasData(vaga.abertura)}</td>
-                        <td>${vaga.cargo}</td>
-                        <td>${vaga.modalidade}</td>
-                        <td class="${statusClass}">${vaga.status}</td>
-                    `;
-                    tbody.appendChild(row);
-                });
             }
         });
 
@@ -888,6 +1135,11 @@
                 document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
                 this.classList.add('active');
             });
+        });
+
+        // Redimensionamento da janela - atualizar conteúdo conforme necessário
+        window.addEventListener('resize', function() {
+            renderizarConteudo();
         });
     </script>
 </body>
