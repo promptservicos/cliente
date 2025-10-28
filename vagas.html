@@ -607,7 +607,10 @@
                         <th onclick="sortTable(2)">
                             Modalidade <i class="fas fa-sort"></i>
                         </th>
-                        <th onclick="sortTable(3)">
+                        <th id="empresaHeader" onclick="sortTable(3)" style="display: none;">
+                            Empresa <i class="fas fa-sort"></i>
+                        </th>
+                        <th onclick="sortTable(4)">
                             Status <i class="fas fa-sort"></i>
                         </th>
                     </tr>
@@ -654,6 +657,7 @@
         let vagas = [];
         let sortDirection = {};
         let userEmpresa = '';
+        let isPromptServicos = false;
 
         // Verificar autenticação
         onAuthStateChanged(auth, (user) => {
@@ -680,6 +684,17 @@
                     // Define a empresa para filtrar no Google Sheets
                     userEmpresa = userData.empresa;
                     document.getElementById('empresaNome').textContent = userEmpresa;
+                    
+                    // Verifica se é da empresa PROMPT SERVIÇOS
+                    isPromptServicos = userEmpresa.toUpperCase().includes('PROMPT SERVIÇOS');
+                    
+                    // Mostra/oculta coluna de empresa na tabela
+                    const empresaHeader = document.getElementById('empresaHeader');
+                    if (isPromptServicos) {
+                        empresaHeader.style.display = 'table-cell';
+                    } else {
+                        empresaHeader.style.display = 'none';
+                    }
                     
                     // Carrega dados do Google Sheets (vagas E funcionários)
                     await carregarVagasDetalhadas();
@@ -738,10 +753,13 @@
                     const empresaNaLinha = row[empresaIndex];
                     const nomeFuncionario = row[nomeIndex];
                     
-                    if (empresaNaLinha && nomeFuncionario && 
-                        empresaNaLinha.trim() === userEmpresa.trim() && 
-                        nomeFuncionario.trim() !== '') {
-                        totalFuncionarios++;
+                    // Se for PROMPT SERVIÇOS, conta todos os funcionários
+                    // Caso contrário, conta apenas funcionários da empresa do usuário
+                    if (nomeFuncionario && nomeFuncionario.trim() !== '') {
+                        if (isPromptServicos || 
+                            (empresaNaLinha && empresaNaLinha.trim() === userEmpresa.trim())) {
+                            totalFuncionarios++;
+                        }
                     }
                 }
                 
@@ -797,8 +815,8 @@
                 const cargoIndex = headers.indexOf('CARGOS'); // Coluna O
                 const modalidadeIndex = headers.indexOf('TIPO DE CONTRATO'); // Coluna S
                 const fechadaIndex = headers.indexOf('VAGA FECHADA'); // Coluna C
-                const empresaEIndex = 4; // Coluna E
-                const empresaFIndex = 5; // Coluna F
+                const empresaEIndex = 4; // Coluna E - NOME DO CLIENTE NOVO
+                const empresaFIndex = 5; // Coluna F - NOME DO CLIENTE ATIVO
                 
                 console.log('🎯 Índices das colunas de vagas:', {
                     abertura: aberturaIndex,
@@ -822,22 +840,29 @@
                     const modalidade = row[modalidadeIndex];
                     
                     // Verifica se a vaga pertence à empresa
-                    const pertenceEmpresa = empresaE === userEmpresa || empresaF === userEmpresa;
+                    // Se for PROMPT SERVIÇOS, mostra todas as vagas
+                    // Caso contrário, mostra apenas vagas da empresa do usuário
+                    const pertenceEmpresa = isPromptServicos || 
+                                          empresaE === userEmpresa || 
+                                          empresaF === userEmpresa;
                     
-                    if (pertenceEmpresa && cargo) {
-                        const vagaAberta = fechada !== 'TRUE' && fechada !== 'true' && fechada !== true;
+                    // Verifica se a vaga está aberta (não fechada)
+                    const vagaAberta = fechada !== 'TRUE' && fechada !== 'true' && fechada !== true;
+                    
+                    // Só adiciona se pertence à empresa e está aberta
+                    if (pertenceEmpresa && cargo && vagaAberta) {
+                        totalVagasAbertas++;
                         
-                        if (vagaAberta) {
-                            totalVagasAbertas++;
-                        }
+                        // Determina qual empresa usar (E ou F)
+                        const empresaVaga = empresaE || empresaF || '';
                         
                         vagas.push({
                             abertura: abertura || 'Data não informada',
                             cargo: cargo || '',
                             modalidade: modalidade || 'A definir',
-                            status: vagaAberta ? 'Aberta' : 'Fechada',
-                            vagaAberta: vagaAberta,
-                            empresa: empresaE || empresaF || ''
+                            status: 'Aberta',
+                            vagaAberta: true,
+                            empresa: empresaVaga
                         });
                     }
                 }
@@ -885,9 +910,9 @@
             if (vagas.length === 0) {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td colspan="4" style="text-align: center; padding: 40px; color: #6c757d;">
+                    <td colspan="${isPromptServicos ? '5' : '4'}" style="text-align: center; padding: 40px; color: #6c757d;">
                         <i class="fas fa-briefcase" style="font-size: 32px; margin-bottom: 10px; display: block; color: #dc3545;"></i>
-                        Nenhuma vaga encontrada para ${userEmpresa}
+                        Nenhuma vaga aberta encontrada ${isPromptServicos ? '' : 'para ' + userEmpresa}
                     </td>
                 `;
                 tbody.appendChild(row);
@@ -901,14 +926,22 @@
 
             vagas.forEach(vaga => {
                 const row = document.createElement('tr');
-                const statusClass = vaga.vagaAberta ? 'vaga-aberta' : 'vaga-fechada';
+                const statusClass = 'vaga-aberta'; // Todas as vagas agora são abertas
                 
-                row.innerHTML = `
+                let rowHTML = `
                     <td>${formatarDataApenasData(vaga.abertura)}</td>
                     <td>${vaga.cargo}</td>
                     <td>${vaga.modalidade}</td>
-                    <td class="${statusClass}">${vaga.status}</td>
                 `;
+                
+                // Adiciona coluna de empresa apenas para PROMPT SERVIÇOS
+                if (isPromptServicos) {
+                    rowHTML += `<td>${vaga.empresa}</td>`;
+                }
+                
+                rowHTML += `<td class="${statusClass}">${vaga.status}</td>`;
+                
+                row.innerHTML = rowHTML;
                 tbody.appendChild(row);
             });
         }
@@ -922,7 +955,7 @@
                 cardsContainer.innerHTML = `
                     <div style="text-align: center; padding: 40px; color: #6c757d;">
                         <i class="fas fa-briefcase" style="font-size: 32px; margin-bottom: 10px; display: block; color: #dc3545;"></i>
-                        Nenhuma vaga encontrada para ${userEmpresa}
+                        Nenhuma vaga aberta encontrada ${isPromptServicos ? '' : 'para ' + userEmpresa}
                     </div>
                 `;
                 return;
@@ -936,9 +969,9 @@
             vagas.forEach(vaga => {
                 const card = document.createElement('div');
                 card.className = 'vaga-card';
-                const statusClass = vaga.vagaAberta ? 'aberta' : 'fechada';
+                const statusClass = 'aberta'; // Todas as vagas agora são abertas
                 
-                card.innerHTML = `
+                let cardHTML = `
                     <div class="vaga-card-header">
                         <div>
                             <div class="vaga-cargo">${vaga.cargo}</div>
@@ -950,12 +983,27 @@
                             <span class="vaga-detail-label">Modalidade</span>
                             <span class="vaga-detail-value">${vaga.modalidade}</span>
                         </div>
+                `;
+                
+                // Adiciona empresa apenas para PROMPT SERVIÇOS
+                if (isPromptServicos) {
+                    cardHTML += `
+                        <div class="vaga-detail-item">
+                            <span class="vaga-detail-label">Empresa</span>
+                            <span class="vaga-detail-value">${vaga.empresa}</span>
+                        </div>
+                    `;
+                }
+                
+                cardHTML += `
                         <div class="vaga-detail-item">
                             <span class="vaga-detail-label">Status</span>
                             <span class="vaga-detail-value ${statusClass}">${vaga.status}</span>
                         </div>
                     </div>
                 `;
+                
+                card.innerHTML = cardHTML;
                 cardsContainer.appendChild(card);
             });
         }
@@ -1011,7 +1059,13 @@
             vagas.sort((a, b) => {
                 let valueA, valueB;
                 
-                switch(columnIndex) {
+                // Ajusta o índice da coluna para PROMPT SERVIÇOS
+                let adjustedColumnIndex = columnIndex;
+                if (!isPromptServicos && columnIndex >= 3) {
+                    adjustedColumnIndex = columnIndex + 1;
+                }
+                
+                switch(adjustedColumnIndex) {
                     case 0: // Abertura
                         valueA = new Date(a.abertura.split(' ')[0]); // Pega apenas a data
                         valueB = new Date(b.abertura.split(' ')[0]);
@@ -1024,7 +1078,11 @@
                         valueA = a.modalidade.toLowerCase();
                         valueB = b.modalidade.toLowerCase();
                         break;
-                    case 3: // Status
+                    case 3: // Empresa (apenas para PROMPT SERVIÇOS)
+                        valueA = a.empresa.toLowerCase();
+                        valueB = b.empresa.toLowerCase();
+                        break;
+                    case 4: // Status
                         valueA = a.status.toLowerCase();
                         valueB = b.status.toLowerCase();
                         break;
@@ -1048,7 +1106,8 @@
                 const vagasFiltradas = vagas.filter(vaga => 
                     vaga.cargo.toLowerCase().includes(searchTerm) ||
                     vaga.modalidade.toLowerCase().includes(searchTerm) ||
-                    vaga.status.toLowerCase().includes(searchTerm)
+                    vaga.status.toLowerCase().includes(searchTerm) ||
+                    (isPromptServicos && vaga.empresa.toLowerCase().includes(searchTerm))
                 );
                 
                 if (window.innerWidth > 768) {
@@ -1059,7 +1118,7 @@
                     if (vagasFiltradas.length === 0) {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                            <td colspan="4" style="text-align: center; padding: 40px; color: #6c757d;">
+                            <td colspan="${isPromptServicos ? '5' : '4'}" style="text-align: center; padding: 40px; color: #6c757d;">
                                 Nenhuma vaga encontrada para "${searchTerm}"
                             </td>
                         `;
@@ -1069,14 +1128,22 @@
 
                     vagasFiltradas.forEach(vaga => {
                         const row = document.createElement('tr');
-                        const statusClass = vaga.vagaAberta ? 'vaga-aberta' : 'vaga-fechada';
+                        const statusClass = 'vaga-aberta'; // Todas as vagas são abertas
                         
-                        row.innerHTML = `
+                        let rowHTML = `
                             <td>${formatarDataApenasData(vaga.abertura)}</td>
                             <td>${vaga.cargo}</td>
                             <td>${vaga.modalidade}</td>
-                            <td class="${statusClass}">${vaga.status}</td>
                         `;
+                        
+                        // Adiciona coluna de empresa apenas para PROMPT SERVIÇOS
+                        if (isPromptServicos) {
+                            rowHTML += `<td>${vaga.empresa}</td>`;
+                        }
+                        
+                        rowHTML += `<td class="${statusClass}">${vaga.status}</td>`;
+                        
+                        row.innerHTML = rowHTML;
                         tbody.appendChild(row);
                     });
                 } else {
@@ -1096,9 +1163,9 @@
                     vagasFiltradas.forEach(vaga => {
                         const card = document.createElement('div');
                         card.className = 'vaga-card';
-                        const statusClass = vaga.vagaAberta ? 'aberta' : 'fechada';
+                        const statusClass = 'aberta'; // Todas as vagas são abertas
                         
-                        card.innerHTML = `
+                        let cardHTML = `
                             <div class="vaga-card-header">
                                 <div>
                                     <div class="vaga-cargo">${vaga.cargo}</div>
@@ -1110,12 +1177,27 @@
                                     <span class="vaga-detail-label">Modalidade</span>
                                     <span class="vaga-detail-value">${vaga.modalidade}</span>
                                 </div>
+                        `;
+                        
+                        // Adiciona empresa apenas para PROMPT SERVIÇOS
+                        if (isPromptServicos) {
+                            cardHTML += `
+                                <div class="vaga-detail-item">
+                                    <span class="vaga-detail-label">Empresa</span>
+                                    <span class="vaga-detail-value">${vaga.empresa}</span>
+                                </div>
+                            `;
+                        }
+                        
+                        cardHTML += `
                                 <div class="vaga-detail-item">
                                     <span class="vaga-detail-label">Status</span>
                                     <span class="vaga-detail-value ${statusClass}">${vaga.status}</span>
                                 </div>
                             </div>
                         `;
+                        
+                        card.innerHTML = cardHTML;
                         cardsContainer.appendChild(card);
                     });
                 }
