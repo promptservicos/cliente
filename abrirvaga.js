@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // URL do Google Apps Script Web App - USE A SUA URL
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby0mTk4AW8Oj0pFAGAEKp-WF_LrXtxPNtokMu8eIcq1XveQEq04_LzEa4M7_IpAltZG/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwpsWTC31zG-MUm2UmtRGSMuil4SlfcJavjm0JmeNgWgfsvflmwLDC1GwwN8N1WjQ0/exec';
 
     // Manipular envio do formulário
     document.getElementById('vagaForm').addEventListener('submit', async function(e) {
