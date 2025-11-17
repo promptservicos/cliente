@@ -70,8 +70,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // URL do Google Apps Script Web App - USE A SUA URL
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwpsWTC31zG-MUm2UmtRGSMuil4SlfcJavjm0JmeNgWgfsvflmwLDC1GwwN8N1WjQ0/exec';
+    // URL do Google Apps Script Web App - USE A NOVA URL DA SUA IMPLANTAÇÃO
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx6MKRxR_M2EeTMIeemlJDbpye8C07RUv7EhcGz1mRFhDCHpjA9c_6GBvoN7GFylawt/exec';
 
     // Manipular envio do formulário
     document.getElementById('vagaForm').addEventListener('submit', async function(e) {
@@ -89,46 +89,40 @@ document.addEventListener('DOMContentLoaded', function() {
             const formData = new FormData(this);
             const data = {
                 // Mapeamento exato para as colunas da planilha
-                timestamp: new Date().toISOString(), // Coluna A
-                parceiro_novo_ou_ativo: formData.get('parceiro_novo_ou_ativo'), // Coluna B
-                tratativa_com: formData.get('tratativa_com'), // Coluna C
-                nome_parceiro: formData.get('nome_parceiro'), // Coluna D
-                representante: formData.get('representante'), // Coluna E
-                motivo_abertura: formData.get('motivo_abertura'), // Coluna F
-                cargo: formData.get('cargo'), // Coluna G
-                quantidade_vagas: formData.get('quantidade_vagas'), // Coluna H
-                faixa_etaria: formData.get('faixa_etaria'), // Coluna I
-                preferencia_sexo: formData.get('preferencia_sexo'), // Coluna J
-                fumante: formData.get('fumante'), // Coluna K
-                escolaridade: formData.get('escolaridade'), // Coluna L
-                curso_superior: formData.get('curso_superior'), // Coluna M
-                vaga_pcd: formData.get('vaga_pcd'), // Coluna N
-                local_trabalho: formData.get('local_trabalho'), // Coluna O
-                descricao_cargos: formData.get('descricao_cargos'), // Coluna P
-                jornada_trabalho: formData.get('jornada_trabalho'), // Coluna Q
-                tipo_contrato: formData.get('tipo_contrato'), // Coluna R
-                requisitos_obrigatorios: formData.get('requisitos_obrigatorios'), // Coluna S
-                salario_beneficios: formData.get('salario_beneficios'), // Coluna T
-                uniforme: formData.get('uniforme'), // Coluna U
-                exames_medicos: formData.get('exames_medicos'), // Coluna V
-                contato: formData.get('contato'), // Coluna W
-                tipo_deficiencia: formData.get('tipo_deficiencia') // Coluna X
+                timestamp: new Date().toISOString(),
+                parceiro_novo_ou_ativo: formData.get('parceiro_novo_ou_ativo'),
+                tratativa_com: formData.get('tratativa_com'),
+                nome_parceiro: formData.get('nome_parceiro'),
+                representante: formData.get('representante'),
+                motivo_abertura: formData.get('motivo_abertura'),
+                cargo: formData.get('cargo'),
+                quantidade_vagas: formData.get('quantidade_vagas'),
+                faixa_etaria: formData.get('faixa_etaria'),
+                preferencia_sexo: formData.get('preferencia_sexo'),
+                fumante: formData.get('fumante'),
+                escolaridade: formData.get('escolaridade'),
+                curso_superior: formData.get('curso_superior'),
+                vaga_pcd: formData.get('vaga_pcd'),
+                local_trabalho: formData.get('local_trabalho'),
+                descricao_cargos: formData.get('descricao_cargos'),
+                jornada_trabalho: formData.get('jornada_trabalho'),
+                tipo_contrato: formData.get('tipo_contrato'),
+                requisitos_obrigatorios: formData.get('requisitos_obrigatorios'),
+                salario_beneficios: formData.get('salario_beneficios'),
+                uniforme: formData.get('uniforme'),
+                exames_medicos: formData.get('exames_medicos'),
+                contato: formData.get('contato'),
+                tipo_deficiencia: formData.get('tipo_deficiencia')
             };
             
             console.log('📤 Enviando dados para a planilha:', data);
             
-            const response = await fetch(SCRIPT_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
-            });
+            // Tentar enviar com XMLHttpRequest primeiro
+            const response = await enviarDados(SCRIPT_URL, data);
             
-            const result = await response.json();
-            console.log('✅ Resposta do servidor:', result);
+            console.log('✅ Resposta do servidor:', response);
             
-            if (result.status === 'success') {
+            if (response.status === 'success') {
                 mostrarMensagemSucesso('Vaga cadastrada com sucesso na planilha "Abertura de Vagas"!');
                 this.reset();
                 
@@ -143,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 
             } else {
-                throw new Error(result.message || 'Erro desconhecido');
+                throw new Error(response.message || 'Erro desconhecido');
             }
             
         } catch (error) {
@@ -156,6 +150,40 @@ document.addEventListener('DOMContentLoaded', function() {
             this.classList.remove('loading');
         }
     });
+
+    // Função para enviar dados usando XMLHttpRequest (evita problemas de CORS)
+    function enviarDados(url, data) {
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', url);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        resolve(response);
+                    } catch (e) {
+                        reject(new Error('Resposta inválida do servidor'));
+                    }
+                } else {
+                    reject(new Error(`Erro HTTP: ${xhr.status}`));
+                }
+            };
+            
+            xhr.onerror = function() {
+                reject(new Error('Erro de rede'));
+            };
+            
+            xhr.ontimeout = function() {
+                reject(new Error('Timeout da requisição'));
+            };
+            
+            xhr.timeout = 30000; // 30 segundos
+            
+            xhr.send(JSON.stringify(data));
+        });
+    }
 
     // Função para mostrar mensagem de sucesso
     function mostrarMensagemSucesso(mensagem) {
