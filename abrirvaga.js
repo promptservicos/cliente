@@ -70,8 +70,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // URL do Google Apps Script Web App - USE A NOVA URL DA SUA IMPLANTAÇÃO
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx6MKRxR_M2EeTMIeemlJDbpye8C07RUv7EhcGz1mRFhDCHpjA9c_6GBvoN7GFylawt/exec';
+    // URL do Google Apps Script Web App - ATUALIZADA
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxgnuEaQPNdROi_hjLF0u5FUwOIRDevV3UsrVeidIGo5sGKvSY3Czz2fI0QbrEV4WDb/exec';
 
     // Manipular envio do formulário
     document.getElementById('vagaForm').addEventListener('submit', async function(e) {
@@ -88,7 +88,6 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             const formData = new FormData(this);
             const data = {
-                // Mapeamento exato para as colunas da planilha
                 timestamp: new Date().toISOString(),
                 parceiro_novo_ou_ativo: formData.get('parceiro_novo_ou_ativo'),
                 tratativa_com: formData.get('tratativa_com'),
@@ -115,10 +114,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 tipo_deficiencia: formData.get('tipo_deficiencia')
             };
             
-            console.log('📤 Enviando dados para a planilha:', data);
+            console.log('📤 Enviando dados:', data);
             
-            // Tentar enviar com XMLHttpRequest primeiro
-            const response = await enviarDados(SCRIPT_URL, data);
+            // SOLUÇÃO CORRIGIDA: Usar fetch com mode 'no-cors' e método simples
+            const response = await enviarParaGoogleAppsScript(data);
             
             console.log('✅ Resposta do servidor:', response);
             
@@ -143,6 +142,13 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             console.error('❌ Erro ao enviar formulário:', error);
             mostrarMensagemErro('Erro ao cadastrar vaga: ' + error.message);
+            
+            // Oferecer alternativa
+            setTimeout(() => {
+                if (confirm('Deseja tentar abrir o Google Forms diretamente?')) {
+                    window.open('https://docs.google.com/forms/d/e/1FAIpQLSeXYZ/createResponse', '_blank');
+                }
+            }, 1000);
         } finally {
             // Reabilitar botão
             submitBtn.disabled = false;
@@ -151,38 +157,52 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Função para enviar dados usando XMLHttpRequest (evita problemas de CORS)
-    function enviarDados(url, data) {
-        return new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', url);
-            xhr.setRequestHeader('Content-Type', 'application/json');
+    // SOLUÇÃO CORRIGIDA: Enviar para Google Apps Script
+    async function enviarParaGoogleAppsScript(data) {
+        // Converter dados para URL encoded (como um formulário normal)
+        const formData = new URLSearchParams();
+        for (const key in data) {
+            if (data[key] !== null && data[key] !== undefined) {
+                formData.append(key, data[key]);
+            }
+        }
+        
+        // Tentar com POST simples
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                // Não usar mode: 'no-cors' pois precisamos ver a resposta
+            });
             
-            xhr.onload = function() {
-                if (xhr.status === 200) {
-                    try {
-                        const response = JSON.parse(xhr.responseText);
-                        resolve(response);
-                    } catch (e) {
-                        reject(new Error('Resposta inválida do servidor'));
-                    }
-                } else {
-                    reject(new Error(`Erro HTTP: ${xhr.status}`));
-                }
-            };
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             
-            xhr.onerror = function() {
-                reject(new Error('Erro de rede'));
-            };
+            const result = await response.json();
+            return result;
             
-            xhr.ontimeout = function() {
-                reject(new Error('Timeout da requisição'));
-            };
+        } catch (error) {
+            console.log('POST falhou, tentando GET...', error);
             
-            xhr.timeout = 30000; // 30 segundos
+            // Fallback: tentar com GET (para CORS)
+            const params = new URLSearchParams(data).toString();
+            const getUrl = `${SCRIPT_URL}?${params}`;
             
-            xhr.send(JSON.stringify(data));
-        });
+            const response = await fetch(getUrl, {
+                method: 'GET',
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const result = await response.json();
+            return result;
+        }
     }
 
     // Função para mostrar mensagem de sucesso
@@ -208,7 +228,38 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Função para mostrar mensagem de erro
     function mostrarMensagemErro(mensagem) {
-        alert(mensagem);
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px 20px;
+            border-radius: 8px;
+            border: 1px solid #f5c6cb;
+            z-index: 10000;
+            max-width: 400px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        `;
+        toast.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-exclamation-circle" style="font-size: 18px;"></i>
+                <div>
+                    <strong>Erro</strong><br>
+                    ${mensagem}
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(toast);
+        
+        // Remover após 8 segundos
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 8000);
     }
 
     // Limpar formulário
